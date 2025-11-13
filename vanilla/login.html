@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <div class="logo">Tech Universe</div>
+        <div>
+            <a href="index.html">Inicio</a>
+            <a href="cart.html">Carrito</a>
+        </div>
+    </nav>
+
+    <!-- Caja de Login / Registro -->
+    <div class="login-container" id="formContainer">
+        
+        <!-- Aquí se cargará dinámicamente el formulario -->
+        
+    </div>
+
+    <script>
+        // ----------- FORMULARIOS -----------
+
+        const loginForm = `
+            <h2>Iniciar Sesión</h2>
+
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" placeholder="ejemplo@correo.com">
+
+            <label for="password">Contraseña</label>
+            <input type="password" id="password" placeholder="********">
+
+            <div class="error" id="errorMsg">Por favor, completa todos los campos.</div>
+
+            <button class="btn-login" onclick="login()">Entrar</button>
+
+            <div class="switch-link">
+                ¿No tienes cuenta? <a onclick="loadRegister()">Regístrate</a>
+            </div>
+        `;
+
+        const registerForm = `
+            <h2>Crear Cuenta</h2>
+
+            <label for="name">Nombre completo</label>
+            <input type="text" id="name" placeholder="Tu nombre">
+
+            <label for="emailReg">Correo electrónico</label>
+            <input type="email" id="emailReg" placeholder="ejemplo@correo.com">
+
+            <label for="passwordReg">Contraseña</label>
+            <input type="password" id="passwordReg" placeholder="********">
+
+            <label for="passwordReg2">Repetir contraseña</label>
+            <input type="password" id="passwordReg2" placeholder="********">
+
+            <div class="error" id="errorMsgReg">Por favor, completa todos los campos.</div>
+
+            <button class="btn-login" onclick="register()">Registrarse</button>
+
+            <div class="switch-link">
+                ¿Ya tienes cuenta? <a onclick="loadLogin()">Inicia sesión</a>
+            </div>
+        `;
+
+        // ----------- CARGA INICIAL -----------
+        function loadLogin() {
+            document.getElementById("formContainer").innerHTML = loginForm;
+        }
+
+        function loadRegister() {
+            document.getElementById("formContainer").innerHTML = registerForm;
+        }
+
+        // Cargar login al entrar en la página
+        loadLogin();
+
+
+        // ----------- FUNCIONES -----------
+
+        function login() {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const errorMsg = document.getElementById("errorMsg");
+
+            if (email === "" || password === "") {
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            errorMsg.style.display = "none";
+
+            window.location.href = "index.html";
+        }
+
+        function register() {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("emailReg").value.trim();
+            const pass1 = document.getElementById("passwordReg").value.trim();
+            const pass2 = document.getElementById("passwordReg2").value.trim();
+            const errorMsg = document.getElementById("errorMsgReg");
+
+            if (name === "" || email === "" || pass1 === "" || pass2 === "") {
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            if (pass1 !== pass2) {
+                errorMsg.innerText = "Las contraseñas no coinciden.";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            // Simulación de registro correcto
+            alert("Registro completado. Puedes iniciar sesión ahora.");
+
+            loadLogin();
+        }
+    </script>
+
+</body>
+</html>
