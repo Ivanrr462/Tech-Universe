@@ -1,36 +1,47 @@
+version: "3.8"
+
 services:
 
   web:
     build: .
     container_name: web_techuniverse
     ports:
-      - "8080:80"
+      - "8080:80"   # Solo si quieres acceso público
     depends_on:
       - db
     volumes:
       - ./techuniverse:/var/www/html
+    networks:
+      - backend-net
 
   db:
     image: mysql:5.7
-    container_name: db__techuniverse
+    container_name: db_techuniverse
     environment:
       MYSQL_ROOT_PASSWORD: usuario1
       MYSQL_DATABASE: prueba
       MYSQL_USER: usuario
       MYSQL_PASSWORD: usuario
-    ports:
-      - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - backend-net
 
   phpmyadmin:
     image: phpmyadmin:5
     container_name: pma_techuniverse
     environment:
-      - PMA_HOST=db
+      PMA_HOST: db
     depends_on:
       - db
     ports:
-      - "8081:80"
+      - "8081:80"   # Solo para pruebas internas
+    networks:
+      - backend-net
+
 volumes:
   db_data:
+
+networks:
+  backend-net:
+    driver: bridge
