@@ -11,3 +11,5 @@ COPY techuniverse/ /var/www/html/
 
 # Exponer puerto 80
 EXPOSE 80
+
+CMD ["apache2-foreground"]
