@@ -6,7 +6,7 @@ services:
     build: .
     container_name: web_techuniverse
     ports:
-      - "8080:80"   # Puerto público para tu API
+      - "8080:80" # Puerto público para tu API
     depends_on:
       - db
     volumes:
@@ -20,11 +20,12 @@ services:
     container_name: db_techuniverse
     environment:
       MYSQL_ROOT_PASSWORD: usuario1
-      MYSQL_DATABASE: prueba
+      MYSQL_DATABASE: techstore
       MYSQL_USER: usuario
       MYSQL_PASSWORD: usuario
     volumes:
       - db_data:/var/lib/mysql
+      - ./techuniverse/database.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - backend-net
     restart: always
@@ -37,13 +38,14 @@ services:
     depends_on:
       - db
     ports:
-      - "8081:80"   # Solo usar mediante túnel SSH
+      - "8081:80" # Solo usar mediante túnel SSH
     networks:
       - backend-net
     restart: always
 
 volumes:
   db_data:
+
 
 networks:
   backend-net:

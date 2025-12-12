@@ -1,15 +1,14 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+  }
+}
+
 provider "aws" {
   region = var.aws_region
-}
-
-# VPC default
-data "aws_vpc" "default" {
-  default = true
-}
-
-# Subnet default
-data "aws_subnet_ids" "default" {
-  vpc_id = data.aws_vpc.default.id
 }
 
 # Security Group
@@ -24,7 +23,7 @@ resource "aws_security_group" "backend_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.allowed_ip]
+    cidr_blocks = [var.allowed_ssh_cidr]
   }
 
   # API PHP
@@ -36,14 +35,7 @@ resource "aws_security_group" "backend_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # phpMyAdmin (opcional, restringido a tu IP)
-  ingress {
-    description = "phpMyAdmin"
-    from_port   = 8081
-    to_port     = 8081
-    protocol    = "tcp"
-    cidr_blocks = [var.allowed_ip]
-  }
+  # phpMyAdmin (Solo accesible mediante túnel SSH, puerto cerrado públicamente)
 
   # Salida: todo permitido
   egress {
@@ -53,20 +45,19 @@ resource "aws_security_group" "backend_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "${var.project_name}-sg"
-  }
 }
 
 # EC2 instance
 resource "aws_instance" "backend" {
-  ami                    = var.ami_id
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
   key_name               = var.key_name
-  subnet_id              = data.aws_subnet_ids.default.ids[0]
+  subnet_id              = data.aws_subnets.default.ids[0]
   vpc_security_group_ids = [aws_security_group.backend_sg.id]
 
-  user_data = file("userdata/ec2-init.sh")
+  user_data = templatefile("userdata/ec2-init.sh", {
+    GIT_REPO_URL = var.git_repo_url
+  })
 
   tags = {
     Name = "${var.project_name}-backend"
