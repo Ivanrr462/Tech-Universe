@@ -44,27 +44,4 @@ class LoginControlador {
         http_response_code(200); // 200 OK
         return $usuario;
     }
-
-    public function infoUser(int $id): array {
-        if ($id <= 0) {
-            http_response_code(400); // 400 Bad Request
-            return [
-                "error" => "Debe indicar un id de usuario válido",
-            ];
-        }
-
-        $usuario = $this->usuario->obtenerPorid($id);
-    
-        if ($usuario === null) {
-            // No existe ningún usuario con ese id
-            http_response_code(404); // 404 Not Found
-            return [
-                "error" => "usuario no encontrado",
-            ];
-        }
-
-        // usuario encontrado
-        http_response_code(200); // 200 OK
-        return $usuario;
-    }
 }

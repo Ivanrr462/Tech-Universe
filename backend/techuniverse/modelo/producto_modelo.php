@@ -16,7 +16,8 @@ class ProductoModelo
      */
     public function obtenerTodos(?int $limit, ?int $offset): array
     {
-        $sql = "SELECT id, nombre, descripcion, stock, precio FROM Producto LIMIT :limit OFFSET :offset";
+        $sql = "SELECT id, nombre, descripcion, stock, precio 
+                FROM Producto LIMIT :limit OFFSET :offset";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(':limit', $limit ,PDO::PARAM_INT);
         $stmt->bindParam(':offset', $offset,  PDO::PARAM_INT);

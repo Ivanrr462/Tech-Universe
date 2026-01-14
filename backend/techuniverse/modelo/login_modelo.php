@@ -42,26 +42,4 @@ class LoginModelo
 
         return $usuarios;
     }
-
-    public function obtenerPorid(int $id) {
-        $sql = "SELECT id, nombre, rol, correo
-                FROM Usuario
-                WHERE id = :id";
-
-        $stmt = $this->pdo->prepare($sql);
-        // Enlazar parámetros
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-
-        // Ejecutar consulta
-        $stmt->execute();
-
-        // fetch() devuelve false si no encuentra datos.
-        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($usuario === false) {
-            return null;
-        }
-
-        return $usuario;
-    }
 }

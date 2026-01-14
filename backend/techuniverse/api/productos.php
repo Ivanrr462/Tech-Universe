@@ -29,7 +29,7 @@ $id = isset($_GET["id"]) ? (int) $_GET["id"] : null;
 
 // Parámetros de paginación: ?page=1&limit=10
 $page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
-$limit = isset($_GET["limit"]) ? (int) $_GET["limit"] : 2; // Cambiar el valor por defecto
+$limit = isset($_GET["limit"]) ? (int) $_GET["limit"] : 4; // Cambiar el valor por defecto
 
 // Calcular el offset para la paginación
 $offset = ($page - 1) * $limit;
@@ -66,7 +66,7 @@ switch ($metodo) {
         // Comprueba el token.
         $user = requireAuth(); // Obtenemos el payload.
         try {
-            if ($user["rol"] === "admin" || $user["rol"] === "usuario") {
+            if (($user["rol"] === "admin") || ($user["rol"] === "usuario")) {
                 // POST /producto.php → crear producto
                 $input = json_decode(file_get_contents("php://input"), true) ?? [];
                 echo json_encode($controlador->crear($input));

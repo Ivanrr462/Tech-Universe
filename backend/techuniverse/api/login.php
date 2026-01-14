@@ -36,6 +36,7 @@ if (isset($resultado["error"])) {
 $payload = [
     "id"    => $resultado["id"],
     "correo" => $resultado["correo"], 
+    "nombre" => $resultado["nombre"], 
     "rol"   => $resultado["rol"],
     "iat"   => time(),
     "exp"   => time() + 3600,
