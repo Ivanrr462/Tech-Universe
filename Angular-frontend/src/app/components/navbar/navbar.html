@@ -36,13 +36,13 @@
         <!-- User/Auth Button -->
         <button (click)="navigateTo('/auth')"
           class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9">
-          <lucide-icon name="user" class="h-5 w-5"></lucide-icon>
+          <lucide-icon [img]="UserIcon" class="h-5 w-5"></lucide-icon>
         </button>
 
         <!-- Cart Button with Badge -->
         <button (click)="navigateTo('/cart')"
           class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9 relative">
-          <lucide-icon name="shopping-cart" class="h-5 w-5"></lucide-icon>
+          <lucide-icon [img]="ShoppingCartIcon" class="h-5 w-5"></lucide-icon>
           @if (cartService.totalItems() > 0) {
           <span
             class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">
@@ -59,7 +59,7 @@
       <div class="relative">
         <button (click)="toggleCategoryDropdown()" (blur)="closeCategoryDropdown()"
           class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 px-3">
-          <lucide-icon name="menu" class="h-4 w-4 mr-2"></lucide-icon>
+          <lucide-icon [img]="MenuIcon" class="h-4 w-4 mr-2"></lucide-icon>
           Categorías
         </button>
 
