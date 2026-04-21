@@ -1,0 +1,8 @@
+{
+    "/api": {
+        "target": "https://ivan123.alwaysdata.net",
+        "secure": true,
+        "changeOrigin": true,
+        "logLevel": "debug"
+    }
+}

@@ -8,7 +8,7 @@ import { Product } from '@models/product.model';
 })
 export class ProductService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://ivan123.alwaysdata.net/api/productos';
+  private apiUrl = '/api/productos';
 
   private mapApiToProduct(apiProduct: any): Product {
     const specs: Record<string, string> = {};
@@ -33,14 +33,20 @@ export class ProductService {
   }
 
   getAllProducts(): Observable<Product[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(apiProducts => apiProducts.map(p => this.mapApiToProduct(p)))
+    return this.http.get<any>(this.apiUrl).pipe(
+      map(response => {
+        const data = response.data ? response.data : response;
+        return Array.isArray(data) ? data.map((p: any) => this.mapApiToProduct(p)) : [];
+      })
     );
   }
 
   getProductById(id: string): Observable<Product | undefined> {
     return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
-      map(p => p ? this.mapApiToProduct(p) : undefined)
+      map(response => {
+        const p = response.data ? response.data : response;
+        return p ? this.mapApiToProduct(p) : undefined;
+      })
     );
   }
 
