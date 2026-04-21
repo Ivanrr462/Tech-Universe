@@ -4,6 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { LucideAngularModule, User, Mail, Lock, ArrowRight } from 'lucide-angular';
 import { ToastService } from '@services/toast.service';
+import { AuthService } from '@services/auth.service';
 
 type AuthMode = 'login' | 'register';
 
@@ -18,6 +19,7 @@ export class Auth {
     private fb = inject(FormBuilder);
     private router = inject(Router);
     private toastService = inject(ToastService);
+    private authService = inject(AuthService);
 
     // Icon references
     readonly UserIcon = User;
@@ -47,9 +49,16 @@ export class Auth {
 
     onLogin(): void {
         if (this.loginForm.valid) {
-            // Mock login
-            this.toastService.success('¡Bienvenido de nuevo!');
-            this.router.navigate(['/']);
+            this.authService.login(this.loginForm.value).subscribe({
+                next: () => {
+                    this.toastService.success('¡Bienvenido de nuevo!');
+                    this.router.navigate(['/']);
+                },
+                error: (err) => {
+                    this.toastService.error('Credenciales incorrectas o error en el servidor');
+                    console.error(err);
+                }
+            });
         } else {
             this.loginForm.markAllAsTouched();
             this.toastService.error('Por favor, completa todos los campos correctamente');
@@ -58,16 +67,23 @@ export class Auth {
 
     onRegister(): void {
         if (this.registerForm.valid) {
-            const { password, confirmPassword } = this.registerForm.value;
+            const { name, email, password, confirmPassword } = this.registerForm.value;
 
             if (password !== confirmPassword) {
                 this.toastService.error('Las contraseñas no coinciden');
                 return;
             }
 
-            // Mock registration
-            this.toastService.success('¡Cuenta creada exitosamente!');
-            this.router.navigate(['/']);
+            this.authService.register({ name, email, password }).subscribe({
+                next: () => {
+                    this.toastService.success('¡Registro exitoso! Por favor inicia sesión.');
+                    this.switchMode('login');
+                },
+                error: (err) => {
+                    this.toastService.error('Error al registrar. Revisa que el email no exista y los datos sean válidos.');
+                    console.error(err);
+                }
+            });
         } else {
             this.registerForm.markAllAsTouched();
             this.toastService.error('Por favor, completa todos los campos correctamente');
