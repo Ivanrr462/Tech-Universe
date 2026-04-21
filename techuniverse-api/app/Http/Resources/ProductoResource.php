@@ -22,6 +22,10 @@ class ProductoResource extends JsonResource
             'stock' => $this->stock,
             'descripcion' => $this->descripcion,
             'creado' => $this->created_at->format('Y-m-d H:i:s'),
+            'foto' => $this->foto
+                ? env('R2_PUBLIC_URL') . '/' . $this->foto
+                : null,
+
             'categoria' => $this->categoria ? [
                 'nombre' => $this->categoria->nombre,
             ] : null,

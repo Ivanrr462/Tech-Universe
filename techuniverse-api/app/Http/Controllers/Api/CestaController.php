@@ -7,8 +7,60 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Resources\CestaResource;
 
+/**
+ * @OA\Tag(
+ *     name="Cesta",
+ *     description="Gestion de la cesta de compra del usuario autenticado"
+ * )
+ *
+ * @OA\Schema(
+ *     schema="Cesta",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="user_id", type="integer", example=1),
+ *     @OA\Property(
+ *         property="productos",
+ *         type="array",
+ *         @OA\Items(
+ *             type="object",
+ *             @OA\Property(property="id", type="integer", example=1),
+ *             @OA\Property(property="nombre", type="string", example="Laptop Gaming"),
+ *             @OA\Property(property="cantidad", type="integer", example=2),
+ *             @OA\Property(property="precio_unitario", type="integer", example=1500)
+ *         )
+ *     )
+ * )
+ */
 class CestaController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/cesta",
+     *     summary="Obtener la cesta del usuario autenticado",
+     *     description="Retorna la cesta de compra con todos los productos del usuario autenticado",
+     *     tags={"Cesta"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Cesta obtenida correctamente",
+     *         @OA\JsonContent(ref="#/components/schemas/Cesta")
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="mensaje", type="string", example="No autenticado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Cesta no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="mensaje", type="string", example="Cesta no encontrada")
+     *         )
+     *     )
+     * )
+     */
     public function index(Request $request)
     {
         $user = $request->user();

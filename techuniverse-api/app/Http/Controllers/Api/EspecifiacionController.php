@@ -8,10 +8,51 @@ use App\Http\Resources\EspecificacionResource;
 use App\Http\Resources\EspecificacionConProductosResource;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Tag(
+ *     name="Especificaciones",
+ *     description="Gestion de especificaciones"
+ * )
+ *
+ * @OA\Schema(
+ *     schema="Especificacion",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="nombre", type="string", example="RAM")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="EspecificacionConProductos",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="nombre", type="string", example="RAM"),
+ *     @OA\Property(
+ *         property="productos",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/Producto")
+ *     )
+ * )
+ */
 class EspecifiacionController extends Controller
 {
     /**
-     * Devolver todas las especificaciones
+     * @OA\Get(
+     *     path="/api/especificaciones",
+     *     summary="Listar todas las especificaciones",
+     *     description="Retorna una lista de todas las especificaciones",
+     *     tags={"Especificaciones"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de especificaciones obtenida correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/Especificacion")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function index()
     {
@@ -22,7 +63,23 @@ class EspecifiacionController extends Controller
     }
 
     /**
-     * Devolver todas las especificaciones con sus productos
+     * @OA\Get(
+     *     path="/api/especificaciones/productos",
+     *     summary="Listar todas las especificaciones con sus productos",
+     *     description="Retorna una lista de todas las especificaciones incluyendo sus productos asociados",
+     *     tags={"Especificaciones"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de especificaciones con productos obtenida correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/EspecificacionConProductos")
+     *             )
+     *         )
+     *     )
+     * )
      */
     public function indexProductos()
     {
@@ -33,7 +90,35 @@ class EspecifiacionController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/especificaciones",
+     *     summary="Crear una nueva especificacion",
+     *     description="Crea una nueva especificacion",
+     *     tags={"Especificaciones"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nombre"},
+     *             @OA\Property(property="nombre", type="string", maxLength=255, example="RAM")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Especificacion creada con exito",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="mensaje", type="string", example="Especificacion creada con exito"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Especificacion")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validacion",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The nombre field is required."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -50,7 +135,33 @@ class EspecifiacionController extends Controller
     }
 
     /**
-     * Muestra una sola especificacion con sus productos
+     * @OA\Get(
+     *     path="/api/especificaciones/{id}",
+     *     summary="Obtener una especificacion por ID",
+     *     description="Retorna una especificacion especifica con sus productos asociados",
+     *     tags={"Especificaciones"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la especificacion",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Especificacion encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", ref="#/components/schemas/EspecificacionConProductos")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Especificacion no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No encontrado")
+     *         )
+     *     )
+     * )
      */
     public function show(string $id)
     {
@@ -66,7 +177,49 @@ class EspecifiacionController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/especificaciones/{id}",
+     *     summary="Actualizar una especificacion",
+     *     description="Actualiza el nombre de una especificacion existente",
+     *     tags={"Especificaciones"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la especificacion a actualizar",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nombre"},
+     *             @OA\Property(property="nombre", type="string", maxLength=255, example="GPU")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Especificacion actualizada correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="mensaje", type="string", example="Actualizado correctamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Especificacion")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Especificacion no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No encontrado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validacion",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The nombre field is required."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
      */
     public function update(Request $request, string $id)
     {
@@ -89,7 +242,33 @@ class EspecifiacionController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/especificaciones/{id}",
+     *     summary="Eliminar una especificacion",
+     *     description="Elimina una especificacion por su ID",
+     *     tags={"Especificaciones"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la especificacion a eliminar",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Especificacion eliminada correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="mensaje", type="string", example="Eliminado correctamente")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Especificacion no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No encontrado")
+     *         )
+     *     )
+     * )
      */
     public function destroy(string $id)
     {
