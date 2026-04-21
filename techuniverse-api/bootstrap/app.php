@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'rol' => \App\Http\Middleware\CheckRol::class,
+            'is_admin' => \App\Http\Middleware\IsAdmin::class,
         ]);
         $middleware->redirectGuestsTo('/api/no-autenticado');
     })

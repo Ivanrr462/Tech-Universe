@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('precio'); // cambiar a decimales
             $table->integer('stock')->default(0);
             $table->string('descripcion');
+            $table->string('foto')->nullable();
             $table->foreignId('categoria_id')->references('id')->on('categorias')->onDelete('cascade');
             $table->timestamps();
         });

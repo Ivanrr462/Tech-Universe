@@ -8,10 +8,48 @@ use App\Http\Resources\CategoriaResource;
 use App\Http\Resources\CategoriaConProductosResource;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Tag(
+ *     name="Categorias",
+ *     description="Gestion de categorias"
+ * )
+ *
+ * @OA\Schema(
+ *     schema="Categoria",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="nombre", type="string", example="Electronica")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="CategoriaConProductos",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="nombre", type="string", example="Electronica"),
+ *     @OA\Property(
+ *         property="productos",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/Producto")
+ *     )
+ * )
+ */
 class CategoriaController extends Controller
 {
     /**
-     * Devolver todas las categorias
+     * @OA\Get(
+     *     path="/api/categorias",
+     *     summary="Listar todas las categorias",
+     *     description="Retorna una lista de todas las categorias",
+     *     tags={"Categorias"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de categorias obtenida correctamente",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Categoria")
+     *         )
+     *     )
+     * )
      */
     public function index()
     {
@@ -19,9 +57,22 @@ class CategoriaController extends Controller
         return CategoriaResource::collection($categoria);
     }
 
-    /*
-        Devolver todas las categorias con sus productos
-    */
+    /**
+     * @OA\Get(
+     *     path="/api/categorias/productos",
+     *     summary="Listar todas las categorias con sus productos",
+     *     description="Retorna una lista de todas las categorias incluyendo sus productos",
+     *     tags={"Categorias"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de categorias con productos obtenida correctamente",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/CategoriaConProductos")
+     *         )
+     *     )
+     * )
+     */
     public function indexProductos()
     {
         $categoria = Categoria::with('productos')->get();
@@ -29,7 +80,35 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/categorias",
+     *     summary="Crear una nueva categoria",
+     *     description="Crea una nueva categoria",
+     *     tags={"Categorias"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nombre"},
+     *             @OA\Property(property="nombre", type="string", maxLength=255, example="Electronica")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Categoria creada con exito",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="mensaje", type="string", example="Categoria creada con exito"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Categoria")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validacion",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The nombre field is required."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -45,10 +124,32 @@ class CategoriaController extends Controller
         ], 201);
     }
 
-    
-
     /**
-     * Muestra una sola categoria con sus productos
+     * @OA\Get(
+     *     path="/api/categorias/{id}",
+     *     summary="Obtener una categoria por ID",
+     *     description="Retorna una categoria especifica con sus productos",
+     *     tags={"Categorias"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la categoria",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Categoria encontrada",
+     *         @OA\JsonContent(ref="#/components/schemas/CategoriaConProductos")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Categoria no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No encontrado")
+     *         )
+     *     )
+     * )
      */
     public function show(string $id)
     {
@@ -62,7 +163,49 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/api/categorias/{id}",
+     *     summary="Actualizar una categoria",
+     *     description="Actualiza el nombre de una categoria existente",
+     *     tags={"Categorias"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la categoria a actualizar",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nombre"},
+     *             @OA\Property(property="nombre", type="string", maxLength=255, example="Informatica")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Categoria actualizada correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="mensaje", type="string", example="Actualizado correctamente"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Categoria")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Categoria no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No encontrado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validacion",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The nombre field is required."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
      */
     public function update(Request $request, string $id)
     {
@@ -85,7 +228,33 @@ class CategoriaController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * @OA\Delete(
+     *     path="/api/categorias/{id}",
+     *     summary="Eliminar una categoria",
+     *     description="Elimina una categoria por su ID",
+     *     tags={"Categorias"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la categoria a eliminar",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Categoria eliminada correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="mensaje", type="string", example="Eliminado correctamente")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Categoria no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No encontrado")
+     *         )
+     *     )
+     * )
      */
     public function destroy(string $id)
     {

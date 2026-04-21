@@ -34,6 +34,7 @@ Route::middleware(['auth:sanctum', 'rol:usuario'])->group(function () {
     Route::apiResource('/cesta/productos', ProductoCestaController::class, ['as' => 'api'])->only(['update', 'store', 'destroy']);
 });
 
+// Rutas de admin
 Route::middleware(['auth:sanctum', 'rol:admin'])->group(function () {
     Route::apiResource('/productos', ProductoController::class, ['as' => 'api'])->except(['index', 'show']);
     Route::apiResource('/categoria', CategoriaController::class, ['as' => 'api'])->except(['index', 'show']);

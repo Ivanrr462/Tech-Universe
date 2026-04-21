@@ -8,10 +8,59 @@ use App\Models\User;
 use App\Models\Producto;
 use App\Models\ProductoCesta;
 
+/**
+ * @OA\Tag(
+ *     name="Cesta Productos",
+ *     description="Gestion de productos dentro de la cesta del usuario autenticado"
+ * )
+ */
 class ProductoCestaController extends Controller
 {
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/api/cesta/productos",
+     *     summary="Añadir un producto a la cesta",
+     *     description="Añade un producto a la cesta del usuario autenticado. Si ya existe, incrementa la cantidad",
+     *     tags={"Cesta Productos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"producto_id", "cantidad"},
+     *             @OA\Property(property="producto_id", type="integer", example=1),
+     *             @OA\Property(property="cantidad", type="integer", minimum=1, example=2)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Producto añadido a la cesta",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Producto añadido a la cesta")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No autenticado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Cesta no encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Cesta no encontrada")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Error de validacion",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="The producto_id field is required."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -53,6 +102,50 @@ class ProductoCestaController extends Controller
         return response()->json(['message' => 'Producto añadido a la cesta']);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/cesta/productos/{id}",
+     *     summary="Actualizar la cantidad de un producto en la cesta",
+     *     description="Actualiza la cantidad de un producto especifico en la cesta del usuario autenticado",
+     *     tags={"Cesta Productos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID del producto a actualizar",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"cantidad"},
+     *             @OA\Property(property="cantidad", type="integer", minimum=1, example=3)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Cantidad actualizada correctamente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Cantidad actualizada")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No autenticado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado en la cesta",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Producto no encontrado en la cesta")
+     *         )
+     *     )
+     * )
+     */
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -85,6 +178,43 @@ class ProductoCestaController extends Controller
         return response()->json(['message' => 'Cantidad actualizada']);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/cesta/productos/{id}",
+     *     summary="Eliminar un producto de la cesta",
+     *     description="Elimina un producto especifico de la cesta del usuario autenticado",
+     *     tags={"Cesta Productos"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID del producto a eliminar de la cesta",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Producto eliminado de la cesta",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Producto eliminado de la cesta")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No autenticado")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado en la cesta",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Producto no encontrado en la cesta")
+     *         )
+     *     )
+     * )
+     */
     public function destroy(string $id)
     {
         $user = request()->user();
