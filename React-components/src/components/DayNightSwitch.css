@@ -1,0 +1,69 @@
+.switch-wrapper input[type="checkbox"] {
+    display: none;
+}
+
+.switch-day-night {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 40px;
+}
+
+.switch-day-night .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #87CEEB; /* Cielo de día */
+    border-radius: 40px;
+    transition: .4s;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* El sol/luna */
+.switch-day-night .slider::before {
+    position: absolute;
+    content: "";
+    height: 32px;
+    width: 32px;
+    left: 4px;
+    bottom: 4px;
+    background-color: #FDB813; /* Sol */
+    border-radius: 50%;
+    transition: .4s;
+    box-shadow: 0 0 15px #FDB813;
+}
+
+/* Nubes / Estrellas simuladas en el fondo */
+.switch-day-night .slider::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    width: 6px; height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 12px 5px 0 2px #fff, -8px 12px 0 1px #fff; /* Nubes */
+    transition: .4s;
+    opacity: 0.8;
+}
+
+/* Estado Checked (Noche) */
+.switch-day-night input:checked + .slider {
+    background-color: #1a2238; /* Cielo de noche */
+}
+
+.switch-day-night input:checked + .slider::before {
+    transform: translateX(40px);
+    background-color: transparent;
+    /* La luna se hace usando un box-shadow sobre un círculo transparente */
+    box-shadow: inset -10px -4px 0 2px #fff, 0 0 15px rgba(255,255,255,0.5);
+}
+
+.switch-day-night input:checked + .slider::after {
+    /* Transformamos las nubes en estrellas */
+    width: 2px; height: 2px;
+    right: 50px;
+    box-shadow: 15px 15px 0 0px #fff, 25px 5px 0 0px #fff, 5px 10px 0 0px #fff;
+    opacity: 1;
+}
