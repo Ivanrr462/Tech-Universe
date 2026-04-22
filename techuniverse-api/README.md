@@ -143,4 +143,4 @@ php artisan test
 
 ## Repo original
 
-Para ver el repo original irse a [Repo]("https://github.com/Ivanrr462/API-TechUniverse")
+Para ver el repo original irse a [Repo](https://github.com/Ivanrr462/API-TechUniverse)
