@@ -22,4 +22,8 @@ export default defineConfig({
     cssCodeSplit: false,
     outDir: 'dist',
   },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('production'),
+    'process.env': JSON.stringify({}),
+  },
 });
