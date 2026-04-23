@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, LogOut } from 'lucide-angular';
 import { ThemeToggle } from '../theme-toggle/theme-toggle';
+import { ThemeService } from '@services/theme.service';
 import { CartService } from '@services/cart.service';
 import { AuthService } from '@services/auth.service';
 import { CATEGORIES } from '@models/product.model';
@@ -28,6 +29,7 @@ export class Navbar {
   private router = inject(Router);
   cartService = inject(CartService);
   authService = inject(AuthService);
+  themeService = inject(ThemeService);
 
   // Icon references
   readonly SearchIcon = Search;
@@ -68,5 +70,12 @@ export class Navbar {
     setTimeout(() => {
       this.showCategoryDropdown = false;
     }, 200);
+  }
+
+  onThemeChange(event: any): void {
+    const newTheme = event.detail.theme;
+    if (this.themeService.theme() !== newTheme) {
+      this.themeService.toggleTheme();
+    }
   }
 }

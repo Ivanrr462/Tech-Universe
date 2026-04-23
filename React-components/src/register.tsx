@@ -20,7 +20,7 @@ import './components/DayNightSwitch.css';
 
 // --- Convertir a Web Components (sin Shadow DOM para que el CSS global funcione) ---
 const ChatBotWC = r2wc(ChatBot);
-const DayNightSwitchWC = r2wc(DayNightSwitch);
+const DayNightSwitchWC = r2wc(DayNightSwitch, { props: { theme: 'string' } });
 
 // --- Registrar Custom Elements ---
 if (!customElements.get('react-chatbot')) {
