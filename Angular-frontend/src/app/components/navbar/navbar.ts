@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
@@ -20,6 +20,7 @@ import { CATEGORIES } from '@models/product.model';
     LucideAngularModule,
     ThemeToggle
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
