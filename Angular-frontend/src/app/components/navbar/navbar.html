@@ -32,7 +32,7 @@
       <div class="flex items-center gap-1">
         <!-- Theme Toggle (Visual: React Switch + Logic: Overlay Button) -->
         <div class="relative flex items-center justify-center overflow-visible" style="width: 56px; height: 28px;">
-          <div style="transform: scale(0.7); transform-origin: center;">
+          <div style="transform: scale(0.7); transform-origin: center; margin-top: 5px;">
             <react-day-night-switch [theme]="themeService.theme()" class="pointer-events-none"></react-day-night-switch>
           </div>
           <button (click)="themeService.toggleTheme()"
