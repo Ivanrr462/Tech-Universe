@@ -59,6 +59,19 @@
         </button>
         }
 
+        <!-- Wishlist Button with Badge -->
+        <button (click)="navigateTo('/wishlist')"
+          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9 relative"
+          title="Lista de deseos">
+          <lucide-icon [img]="HeartIcon" class="h-5 w-5"></lucide-icon>
+          @if (wishlistService.items().length > 0) {
+          <span
+            class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">
+            {{ wishlistService.items().length > 99 ? '99+' : wishlistService.items().length }}
+          </span>
+          }
+        </button>
+
         <!-- Cart Button with Badge -->
         <button (click)="navigateTo('/cart')"
           class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9 relative">

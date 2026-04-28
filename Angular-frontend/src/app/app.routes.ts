@@ -37,6 +37,11 @@ export const routes: Routes = [
     title: 'Búsqueda - Tech Cart Quest'
   },
   {
+    path: 'wishlist',
+    loadComponent: () => import('./pages/wishlist/wishlist').then(m => m.Wishlist),
+    title: 'Lista de Deseos - Tech Cart Quest'
+  },
+  {
     path: '**',
     loadComponent: () => import('./pages/not-found/not-found').then(m => m.NotFound),
     title: '404 - Página no encontrada'

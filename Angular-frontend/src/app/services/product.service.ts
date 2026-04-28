@@ -3,6 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Product } from '@models/product.model';
 
+export interface PaginatedProducts {
+  products: Product[];
+  currentPage: number;
+  lastPage: number;
+  total: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -25,18 +32,34 @@ export class ProductService {
       image: apiProduct.foto,
       category: apiProduct.categoria?.nombre || 'General',
       description: apiProduct.descripcion,
-      specs: specs,
+      specs,
       stock: apiProduct.stock,
       isNew: apiProduct.isNew || undefined,
-      discount: apiProduct.discount || undefined
+      discount: apiProduct.discount || undefined,
     };
   }
 
-  getAllProducts(): Observable<Product[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
+  getProducts(page = 1): Observable<PaginatedProducts> {
+    return this.http.get<any>(`${this.apiUrl}?page=${page}`).pipe(
+      map(response => ({
+        products: (response.data || []).map((p: any) => this.mapApiToProduct(p)),
+        currentPage: response.current_page || 1,
+        lastPage: response.last_page || 1,
+        total: response.total || 0,
+      }))
+    );
+  }
+
+  getAllByCategories(): Observable<Record<string, Product[]>> {
+    return this.http.get<any>('/api/categorias/productos').pipe(
       map(response => {
-        const data = response.data ? response.data : response;
-        return Array.isArray(data) ? data.map((p: any) => this.mapApiToProduct(p)) : [];
+        const categories = Array.isArray(response) ? response : (response.data || []);
+        const result: Record<string, Product[]> = {};
+        categories.forEach((cat: any) => {
+          const products = (cat.productos || []).map((p: any) => this.mapApiToProduct(p));
+          result[cat.nombre] = products;
+        });
+        return result;
       })
     );
   }
@@ -50,37 +73,11 @@ export class ProductService {
     );
   }
 
-  getProductsByCategory(category: string): Observable<Product[]> {
-    return this.getAllProducts().pipe(
-      map(products =>
-        products.filter(p => p.category.toLowerCase() === category.toLowerCase())
-      )
-    );
-  }
-
-  searchProducts(query: string): Observable<Product[]> {
-    const lowerQuery = query.toLowerCase();
-    return this.getAllProducts().pipe(
-      map(products =>
-        products.filter(
-          p =>
-            p.name.toLowerCase().includes(lowerQuery) ||
-            p.description.toLowerCase().includes(lowerQuery) ||
-            p.category.toLowerCase().includes(lowerQuery)
-        )
-      )
-    );
-  }
-
   getFeaturedProducts(): Observable<Product[]> {
-    return this.getAllProducts().pipe(
-      map(products => products.filter(p => p.isNew))
-    );
+    return this.getProducts(1).pipe(map(r => r.products.filter(p => p.isNew)));
   }
 
   getDiscountProducts(): Observable<Product[]> {
-    return this.getAllProducts().pipe(
-      map(products => products.filter(p => p.discount))
-    );
+    return this.getProducts(1).pipe(map(r => r.products.filter(p => p.discount)));
   }
 }
