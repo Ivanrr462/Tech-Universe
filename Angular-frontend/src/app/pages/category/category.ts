@@ -1,16 +1,14 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProductService } from '@services/product.service';
 import { ProductCard } from '@components/product-card/product-card';
 import { Pagination } from '@components/pagination/pagination';
 import { LucideAngularModule, ArrowLeft, PackageX } from 'lucide-angular';
-import { switchMap, map, tap } from 'rxjs/operators';
+import { switchMap, map, tap, distinctUntilChanged } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Subject, combineLatest } from 'rxjs';
 import { Product } from '@models/product.model';
-
-const PAGE_SIZE = 12;
 
 @Component({
   selector: 'app-category',
@@ -26,7 +24,7 @@ export class Category {
   readonly ArrowLeftIcon = ArrowLeft;
   readonly PackageXIcon = PackageX;
 
-  currentPage = signal(1);
+  private pageSubject = new BehaviorSubject(1);
 
   categoryName = toSignal(
     this.route.paramMap.pipe(
@@ -40,50 +38,43 @@ export class Category {
     { initialValue: '' }
   );
 
-  // Resolves what to fetch based on category slug
-  private categoryData = toSignal(
+  paginatedData = toSignal(
     this.route.paramMap.pipe(
-      tap(() => this.currentPage.set(1)),
-      switchMap(params => {
-        const slug = params.get('category') || '';
+      map(p => p.get('category') || ''),
+      distinctUntilChanged(),
+      tap(() => this.pageSubject.next(1)),
+      switchMap(slug => {
         if (slug === 'todos') {
-          return this.productService.getAllByCategories().pipe(
-            map(catMap => {
-              const all = Object.values(catMap).flat();
-              return { allProducts: all, isTodos: true };
-            })
+          // Paginación server-side via /api/productos
+          return this.pageSubject.pipe(
+            switchMap(page =>
+              this.productService.getProducts(page).pipe(
+                map(r => ({ products: r.products, currentPage: r.currentPage, lastPage: r.lastPage }))
+              )
+            )
           );
         }
+
+        // Categorías específicas y ofertas — client-side con getAllByCategories
         return this.productService.getAllByCategories().pipe(
           map(catMap => {
-            let filtered: Product[];
+            let products: Product[];
             if (slug === 'ofertas') {
-              filtered = Object.values(catMap).flat().filter(p => p.discount);
+              products = Object.values(catMap).flat().filter(p => p.discount);
             } else {
-              const categoryName = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-              filtered = catMap[categoryName] || [];
+              const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+              products = catMap[name] || [];
             }
-            return { allProducts: filtered, isTodos: false };
+            return { products, currentPage: 1, lastPage: 1 };
           })
         );
       })
     ),
-    { initialValue: { allProducts: [] as Product[], isTodos: false } }
+    { initialValue: { products: [] as Product[], currentPage: 1, lastPage: 1 } }
   );
 
-  lastPage = computed(() => {
-    const all = this.categoryData().allProducts;
-    return Math.max(1, Math.ceil(all.length / PAGE_SIZE));
-  });
-
-  pagedProducts = computed(() => {
-    const all = this.categoryData().allProducts;
-    const start = (this.currentPage() - 1) * PAGE_SIZE;
-    return all.slice(start, start + PAGE_SIZE);
-  });
-
   onPageChange(page: number): void {
-    this.currentPage.set(page);
+    this.pageSubject.next(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
