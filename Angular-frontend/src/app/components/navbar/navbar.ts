@@ -1,6 +1,6 @@
 import { Component, inject, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, LogOut, Heart } from 'lucide-angular';
@@ -17,6 +17,7 @@ import { CATEGORIES } from '@models/product.model';
   imports: [
     CommonModule,
     RouterLink,
+    RouterLinkActive,
     FormsModule,
     LucideAngularModule
   ],

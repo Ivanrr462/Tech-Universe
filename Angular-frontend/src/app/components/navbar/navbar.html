@@ -108,9 +108,15 @@
         }
       </div>
 
-      <!-- Category Links (first 5) -->
-      @for (category of categories.slice(0, 5); track category) {
+      <!-- Category Links -->
+      <a routerLink="/category/todos"
+        routerLinkActive="text-primary font-medium"
+        class="text-sm text-muted-foreground hover:text-foreground transition-colors">
+        Todos
+      </a>
+      @for (category of categories; track category) {
       <a [routerLink]="['/category', category.toLowerCase().replace(/\s+/g, '-')]"
+        routerLinkActive="text-primary font-medium"
         class="text-sm text-muted-foreground hover:text-foreground transition-colors">
         {{ category }}
       </a>

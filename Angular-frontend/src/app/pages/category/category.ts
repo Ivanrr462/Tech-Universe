@@ -10,6 +10,7 @@ import { BehaviorSubject, of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Product } from '@models/product.model';
 
+
 @Component({
   selector: 'app-category',
   standalone: true,
@@ -63,7 +64,7 @@ export class Category {
         const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         return this.productService.getCategorias().pipe(
           switchMap(cats => {
-            const cat = cats.find(c => c.nombre.toLowerCase() === name.toLowerCase());
+            const cat = cats.find(c => c.nombre.localeCompare(name, 'es', { sensitivity: 'base' }) === 0);
             if (!cat) return of({ products: [] as Product[], currentPage: 1, lastPage: 1, paginated: false });
             return this.productService.getProductsByCategory(cat.id).pipe(
               map(products => ({ products, currentPage: 1, lastPage: 1, paginated: false }))
