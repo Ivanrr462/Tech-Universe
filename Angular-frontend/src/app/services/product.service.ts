@@ -10,6 +10,11 @@ export interface PaginatedProducts {
   total: number;
 }
 
+export interface Categoria {
+  id: number;
+  nombre: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -39,28 +44,33 @@ export class ProductService {
     };
   }
 
+  private mapPaginatedResponse(response: any): PaginatedProducts {
+    return {
+      products: (response.data || []).map((p: any) => this.mapApiToProduct(p)),
+      currentPage: response.current_page || 1,
+      lastPage: response.last_page || 1,
+      total: response.total || 0,
+    };
+  }
+
+  // Todos los productos paginados — para /category/todos
   getProducts(page = 1): Observable<PaginatedProducts> {
     return this.http.get<any>(`${this.apiUrl}?page=${page}`).pipe(
-      map(response => ({
-        products: (response.data || []).map((p: any) => this.mapApiToProduct(p)),
-        currentPage: response.current_page || 1,
-        lastPage: response.last_page || 1,
-        total: response.total || 0,
-      }))
+      map(response => this.mapPaginatedResponse(response))
     );
   }
 
-  getAllByCategories(): Observable<Record<string, Product[]>> {
-    return this.http.get<any>('/api/categoria/productos').pipe(
-      map(response => {
-        const categories = Array.isArray(response) ? response : (response.data || []);
-        const result: Record<string, Product[]> = {};
-        categories.forEach((cat: any) => {
-          const products = (cat.productos || []).map((p: any) => this.mapApiToProduct(p));
-          result[cat.nombre] = products;
-        });
-        return result;
-      })
+  // Lista de categorías con sus IDs
+  getCategorias(): Observable<Categoria[]> {
+    return this.http.get<any>('/api/categoria').pipe(
+      map(response => Array.isArray(response) ? response : (response.data || []))
+    );
+  }
+
+  // Productos de una categoría específica paginados — para /category/:slug
+  getProductsByCategory(categoryId: number): Observable<Product[]> {
+    return this.http.get<any>(`/api/categoria/${categoryId}`).pipe(
+      map(response => (response.data?.productos || []).map((p: any) => this.mapApiToProduct(p)))
     );
   }
 

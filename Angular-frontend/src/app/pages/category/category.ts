@@ -6,7 +6,7 @@ import { ProductCard } from '@components/product-card/product-card';
 import { Pagination } from '@components/pagination/pagination';
 import { LucideAngularModule, ArrowLeft, PackageX } from 'lucide-angular';
 import { switchMap, map, tap, distinctUntilChanged } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Product } from '@models/product.model';
 
@@ -45,32 +45,34 @@ export class Category {
       tap(() => this.pageSubject.next(1)),
       switchMap(slug => {
         if (slug === 'todos') {
-          // Paginación server-side via /api/productos
           return this.pageSubject.pipe(
             switchMap(page =>
               this.productService.getProducts(page).pipe(
-                map(r => ({ products: r.products, currentPage: r.currentPage, lastPage: r.lastPage }))
+                map(r => ({ products: r.products, currentPage: r.currentPage, lastPage: r.lastPage, paginated: true }))
               )
             )
           );
         }
 
-        // Categorías específicas y ofertas — client-side con getAllByCategories
-        return this.productService.getAllByCategories().pipe(
-          map(catMap => {
-            let products: Product[];
-            if (slug === 'ofertas') {
-              products = Object.values(catMap).flat().filter(p => p.discount);
-            } else {
-              const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-              products = catMap[name] || [];
-            }
-            return { products, currentPage: 1, lastPage: 1 };
+        if (slug === 'ofertas') {
+          return this.productService.getProducts(1).pipe(
+            map(r => ({ products: r.products.filter(p => p.discount), currentPage: 1, lastPage: 1, paginated: false }))
+          );
+        }
+
+        const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        return this.productService.getCategorias().pipe(
+          switchMap(cats => {
+            const cat = cats.find(c => c.nombre.toLowerCase() === name.toLowerCase());
+            if (!cat) return of({ products: [] as Product[], currentPage: 1, lastPage: 1, paginated: false });
+            return this.productService.getProductsByCategory(cat.id).pipe(
+              map(products => ({ products, currentPage: 1, lastPage: 1, paginated: false }))
+            );
           })
         );
       })
     ),
-    { initialValue: { products: [] as Product[], currentPage: 1, lastPage: 1 } }
+    { initialValue: { products: [] as Product[], currentPage: 1, lastPage: 1, paginated: false } }
   );
 
   onPageChange(page: number): void {

@@ -36,16 +36,13 @@ export class Search {
     this.route.queryParamMap.pipe(
       tap(() => this.currentPage.set(1)),
       switchMap(params => {
-        const query = params.get('q')?.toLowerCase() || '';
-        return this.productService.getAllByCategories().pipe(
-          map(catMap => {
-            const all = Object.values(catMap).flat();
-            return all.filter(p =>
-              p.name.toLowerCase().includes(query) ||
-              p.description.toLowerCase().includes(query) ||
-              p.category.toLowerCase().includes(query)
-            );
-          })
+        const query = (params.get('q') || '').toLowerCase();
+        return this.productService.getProducts(1).pipe(
+          map(r => r.products.filter((p: Product) =>
+            p.name.toLowerCase().includes(query) ||
+            p.description.toLowerCase().includes(query) ||
+            p.category.toLowerCase().includes(query)
+          ))
         );
       })
     ),
