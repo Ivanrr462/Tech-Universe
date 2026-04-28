@@ -45,11 +45,12 @@ export class ProductService {
   }
 
   private mapPaginatedResponse(response: any): PaginatedProducts {
+    const meta = response.meta || response;
     return {
       products: (response.data || []).map((p: any) => this.mapApiToProduct(p)),
-      currentPage: response.current_page || 1,
-      lastPage: response.last_page || 1,
-      total: response.total || 0,
+      currentPage: meta.current_page || 1,
+      lastPage: meta.last_page || 1,
+      total: meta.total || 0,
     };
   }
 
