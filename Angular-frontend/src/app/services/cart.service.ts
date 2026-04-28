@@ -36,14 +36,14 @@ export class CartService {
   loadCart(): void {
     this.http.get<any>('/api/cesta').subscribe({
       next: (response) => {
-        const cestaProductos = response.cesta_productos || response.productos || [];
+        const cestaProductos = response.data?.productos || [];
         this.itemsSignal.set(
           cestaProductos.map((cp: any) => ({
             cestaProductoId: cp.id,
-            productId: (cp.producto_id ?? cp.producto?.id)?.toString(),
-            name: cp.producto?.nombre,
-            price: cp.producto?.precio,
-            image: cp.producto?.foto,
+            productId: cp.producto_id?.toString() ?? cp.id?.toString(),
+            name: cp.nombre ?? '',
+            price: parseFloat(cp.precio_unitario) || 0,
+            image: cp.foto ?? cp.imagen ?? '',
             quantity: cp.cantidad,
           }))
         );
@@ -60,19 +60,8 @@ export class CartService {
     }
 
     this.http.post<any>('/api/cesta/productos', { producto_id: Number(productId), cantidad: 1 }).subscribe({
-      next: (response) => {
-        const cp = response.cesta_producto || response;
-        this.itemsSignal.update(items => [
-          ...items,
-          {
-            cestaProductoId: cp.id,
-            productId,
-            name,
-            price,
-            image,
-            quantity: cp.cantidad || 1,
-          },
-        ]);
+      next: () => {
+        this.loadCart();
         this.toastService.success('Producto añadido al carrito');
       },
       error: () => this.toastService.error('Error al añadir al carrito')
