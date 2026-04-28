@@ -19,21 +19,21 @@ export class ProductService {
 
   private mapApiToProduct(apiProduct: any): Product {
     const specs: Record<string, string> = {};
-    if (apiProduct.especificaciones && Array.isArray(apiProduct.especificaciones)) {
+    if (Array.isArray(apiProduct.especificaciones)) {
       apiProduct.especificaciones.forEach((spec: any) => {
-        specs[spec.nombre] = spec.valor;
+        if (spec?.nombre) specs[spec.nombre] = spec.valor ?? '';
       });
     }
 
     return {
-      id: apiProduct.id.toString(),
-      name: apiProduct.nombre,
-      price: apiProduct.precio,
-      image: apiProduct.foto,
-      category: apiProduct.categoria?.nombre || 'General',
-      description: apiProduct.descripcion,
+      id: (apiProduct.id ?? apiProduct.producto_id)?.toString() ?? '',
+      name: apiProduct.nombre ?? '',
+      price: apiProduct.precio ?? 0,
+      image: apiProduct.foto ?? '',
+      category: apiProduct.categoria?.nombre ?? 'General',
+      description: apiProduct.descripcion ?? '',
       specs,
-      stock: apiProduct.stock,
+      stock: apiProduct.stock ?? 0,
       isNew: apiProduct.isNew || undefined,
       discount: apiProduct.discount || undefined,
     };
@@ -51,7 +51,7 @@ export class ProductService {
   }
 
   getAllByCategories(): Observable<Record<string, Product[]>> {
-    return this.http.get<any>('/api/categorias/productos').pipe(
+    return this.http.get<any>('/api/categoria/productos').pipe(
       map(response => {
         const categories = Array.isArray(response) ? response : (response.data || []);
         const result: Record<string, Product[]> = {};

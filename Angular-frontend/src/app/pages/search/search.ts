@@ -26,7 +26,6 @@ export class Search {
   readonly SearchXIcon = SearchX;
 
   currentPage = signal(1);
-  lastPage = signal(1);
 
   searchQuery = toSignal(
     this.route.queryParamMap.pipe(map(p => p.get('q') || '')),
@@ -53,12 +52,13 @@ export class Search {
     { initialValue: [] as Product[] }
   );
 
+  lastPage = computed(() =>
+    Math.max(1, Math.ceil(this.allResults().length / PAGE_SIZE))
+  );
+
   pagedResults = computed(() => {
     const all = this.allResults();
-    const page = this.currentPage();
-    const pages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
-    this.lastPage.set(pages);
-    const start = (page - 1) * PAGE_SIZE;
+    const start = (this.currentPage() - 1) * PAGE_SIZE;
     return all.slice(start, start + PAGE_SIZE);
   });
 

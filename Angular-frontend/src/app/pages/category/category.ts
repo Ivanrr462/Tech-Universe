@@ -27,7 +27,6 @@ export class Category {
   readonly PackageXIcon = PackageX;
 
   currentPage = signal(1);
-  lastPage = signal(1);
 
   categoryName = toSignal(
     this.route.paramMap.pipe(
@@ -72,14 +71,14 @@ export class Category {
     { initialValue: { allProducts: [] as Product[], isTodos: false } }
   );
 
+  lastPage = computed(() => {
+    const all = this.categoryData().allProducts;
+    return Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  });
+
   pagedProducts = computed(() => {
-    const data = this.categoryData();
-    const page = this.currentPage();
-    const all = data.allProducts;
-    const total = all.length;
-    const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-    this.lastPage.set(pages);
-    const start = (page - 1) * PAGE_SIZE;
+    const all = this.categoryData().allProducts;
+    const start = (this.currentPage() - 1) * PAGE_SIZE;
     return all.slice(start, start + PAGE_SIZE);
   });
 
