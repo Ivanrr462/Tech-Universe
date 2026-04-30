@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class AuthApiTest extends TestCase
 {
@@ -23,12 +23,12 @@ class AuthApiTest extends TestCase
         $response = $this->postJson('/api/register', $data);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Usuario registrado exitosamente. Por favor inicia sesión.'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Usuario registrado exitosamente. Por favor inicia sesión.',
+            ]);
 
         $this->assertDatabaseHas('users', [
-            'email' => 'ana@example.com'
+            'email' => 'ana@example.com',
         ]);
     }
 
@@ -45,7 +45,7 @@ class AuthApiTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure(['access_token', 'token_type', 'user', 'mensaje']);
+            ->assertJsonStructure(['access_token', 'token_type', 'user', 'mensaje']);
     }
 
     public function test_puede_cerrar_sesion_con_usuario_autenticado()
@@ -56,8 +56,8 @@ class AuthApiTest extends TestCase
         $response = $this->postJson('/api/logout');
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Sesión cerrada correctamente'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Sesión cerrada correctamente',
+            ]);
     }
 }

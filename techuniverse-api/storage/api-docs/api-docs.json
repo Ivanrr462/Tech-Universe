@@ -604,14 +604,14 @@
                 ]
             }
         },
-        "/api/especificaciones": {
+        "/api/especificacion": {
             "get": {
                 "tags": [
                     "Especificaciones"
                 ],
                 "summary": "Listar todas las especificaciones",
                 "description": "Retorna una lista de todas las especificaciones",
-                "operationId": "e7cb11ef25293e8239d6680daaa21437",
+                "operationId": "722baabfa8a49d5dfb9bd41ce4ed79c2",
                 "responses": {
                     "200": {
                         "description": "Lista de especificaciones obtenida correctamente",
@@ -639,7 +639,7 @@
                 ],
                 "summary": "Crear una nueva especificacion",
                 "description": "Crea una nueva especificacion",
-                "operationId": "15a7e990816abdab4e665ea080bb8c5f",
+                "operationId": "01137da7be9c8a0098d80ee42b4ed770",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -702,14 +702,14 @@
                 }
             }
         },
-        "/api/especificaciones/productos": {
+        "/api/especificacion/productos": {
             "get": {
                 "tags": [
                     "Especificaciones"
                 ],
                 "summary": "Listar todas las especificaciones con sus productos",
                 "description": "Retorna una lista de todas las especificaciones incluyendo sus productos asociados",
-                "operationId": "5822ff0d34b00a4c5559fd52a90037e5",
+                "operationId": "05efd52056bc1480985d5dae08ecbdea",
                 "responses": {
                     "200": {
                         "description": "Lista de especificaciones con productos obtenida correctamente",
@@ -732,14 +732,14 @@
                 }
             }
         },
-        "/api/especificaciones/{id}": {
+        "/api/especificacion/{id}": {
             "get": {
                 "tags": [
                     "Especificaciones"
                 ],
                 "summary": "Obtener una especificacion por ID",
                 "description": "Retorna una especificacion especifica con sus productos asociados",
-                "operationId": "2d62ecf7fb4482735fc9908ca73b3b83",
+                "operationId": "5b935ec006c14bab35a4244c8a1a14ca",
                 "parameters": [
                     {
                         "name": "id",
@@ -792,7 +792,7 @@
                 ],
                 "summary": "Actualizar una especificacion",
                 "description": "Actualiza el nombre de una especificacion existente",
-                "operationId": "a2972ca8307680fe1b04815b0d5b7ef0",
+                "operationId": "d77458cac60fe42088debdae5b8f94a0",
                 "parameters": [
                     {
                         "name": "id",
@@ -888,7 +888,7 @@
                 ],
                 "summary": "Eliminar una especificacion",
                 "description": "Elimina una especificacion por su ID",
-                "operationId": "55b01d23a9dbc8809cdbdf7da54b3ef4",
+                "operationId": "8af304595599e1f333afb7ef7b994ddf",
                 "parameters": [
                     {
                         "name": "id",
@@ -1223,19 +1223,57 @@
                 "tags": [
                     "Productos"
                 ],
-                "summary": "Listar todos los productos",
-                "description": "Retorna una lista de todos los productos con su categoría y especificaciones",
+                "summary": "Listar productos con paginación",
+                "description": "Retorna una lista paginada de productos, incluyendo su categoría y especificaciones.",
                 "operationId": "70a301af8ea04ce2f2596a58758632cd",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página a obtener",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Lista de productos obtenida correctamente",
+                        "description": "Lista paginada de productos obtenida correctamente",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Producto"
-                                    }
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Producto"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 60
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -1568,14 +1606,14 @@
                 }
             }
         },
-        "/api/producto-especificaciones": {
+        "/api/producto/especificacion": {
             "post": {
                 "tags": [
                     "Producto Especificaciones"
                 ],
                 "summary": "Añadir una especificacion a un producto",
                 "description": "Asocia una especificacion con un valor a un producto",
-                "operationId": "e7e804f69729cbeffa3e009d05153a80",
+                "operationId": "3712916a1eb2014f51762850489b980c",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1648,14 +1686,14 @@
                 }
             }
         },
-        "/api/producto-especificaciones/{id}": {
+        "/api/producto/especificacion/{id}": {
             "put": {
                 "tags": [
                     "Producto Especificaciones"
                 ],
                 "summary": "Actualizar el valor de una especificacion de un producto",
                 "description": "Actualiza el valor de una especificacion asociada a un producto",
-                "operationId": "e8f967ed9cba6572d0fd05a800ea7f04",
+                "operationId": "f1cf18edfbf0d8170ab197933f33266e",
                 "parameters": [
                     {
                         "name": "id",
@@ -1732,7 +1770,7 @@
                 ],
                 "summary": "Eliminar una especificacion de un producto",
                 "description": "Elimina la asociacion entre una especificacion y un producto",
-                "operationId": "57594d610f094000a8d1a1f0aa003dac",
+                "operationId": "70068627177d9c734d7c1acf35395303",
                 "parameters": [
                     {
                         "name": "id",
@@ -2101,14 +2139,14 @@
                 }
             }
         },
-        "/api/wishlist": {
+        "/api/deseos": {
             "get": {
                 "tags": [
                     "Wishlist"
                 ],
                 "summary": "Listar todos los usuarios con su wishlist",
                 "description": "Retorna todos los usuarios con sus productos deseados",
-                "operationId": "25e51433040f79ef596ee4001198d4f2",
+                "operationId": "58b929363d33117c81990700d4856b8d",
                 "responses": {
                     "200": {
                         "description": "Lista de wishlists obtenida correctamente",
@@ -2131,7 +2169,7 @@
                 ],
                 "summary": "Añadir un producto a la wishlist",
                 "description": "Añade un producto a la wishlist de un usuario. Si ya existe, no lo duplica",
-                "operationId": "4d737863e1e2109ef861ed056c61ac2b",
+                "operationId": "19aa2cf0d64192fa0c9031df4d1237b9",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2214,14 +2252,14 @@
                 }
             }
         },
-        "/api/wishlist/{id}": {
+        "/api/deseos/{id}": {
             "get": {
                 "tags": [
                     "Wishlist"
                 ],
                 "summary": "Obtener la wishlist de un usuario",
                 "description": "Retorna la wishlist de un usuario especifico",
-                "operationId": "efa9d5794d7f70674dd6fd7e4296b5a1",
+                "operationId": "74dd831f93dede445da1c27987de1051",
                 "parameters": [
                     {
                         "name": "id",
@@ -2264,14 +2302,14 @@
                 }
             }
         },
-        "/api/wishlist/{productoId}": {
+        "/api/deseos/{productoId}": {
             "delete": {
                 "tags": [
                     "Wishlist"
                 ],
                 "summary": "Eliminar un producto de la wishlist",
                 "description": "Elimina un producto especifico de la wishlist de un usuario",
-                "operationId": "098d3de3726cbe502f57e6dece579a05",
+                "operationId": "e7ebe25d06929b33c70cecb65aff976a",
                 "parameters": [
                     {
                         "name": "productoId",

@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\Producto;
 use App\Models\Categoria;
+use App\Models\Producto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class ProductoApiTest extends TestCase
 {
@@ -20,7 +22,7 @@ class ProductoApiTest extends TestCase
         $response = $this->getJson('/api/productos');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_puede_mostrar_un_producto()
@@ -30,7 +32,7 @@ class ProductoApiTest extends TestCase
         $response = $this->getJson("/api/productos/{$producto->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonStructure(['data']);
+            ->assertJsonStructure(['data']);
     }
 
     public function test_devuelve_404_si_producto_no_existe()
@@ -42,6 +44,8 @@ class ProductoApiTest extends TestCase
 
     public function test_puede_crear_un_producto()
     {
+        Storage::fake('r2');
+
         $admin = User::factory()->create(['rol' => 'admin']);
         Sanctum::actingAs($admin, ['*']);
 
@@ -52,17 +56,18 @@ class ProductoApiTest extends TestCase
             'precio' => 120,
             'descripcion' => 'Teclado RGB',
             'categoria_id' => $categoria->id,
+            'foto' => UploadedFile::fake()->image('producto.jpg'),
         ];
 
         $response = $this->postJson('/api/productos', $data);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Producto creado con éxito'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Producto creado con éxito',
+            ]);
 
         $this->assertDatabaseHas('productos', [
-            'nombre' => 'Teclado Mecánico'
+            'nombre' => 'Teclado Mecánico',
         ]);
     }
 
@@ -84,12 +89,12 @@ class ProductoApiTest extends TestCase
         $response = $this->putJson("/api/productos/{$producto->id}", $data);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Actualizado correctamente'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Actualizado correctamente',
+            ]);
 
         $this->assertDatabaseHas('productos', [
-            'nombre' => 'Producto Actualizado'
+            'nombre' => 'Producto Actualizado',
         ]);
     }
 
@@ -105,7 +110,7 @@ class ProductoApiTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseMissing('productos', [
-            'id' => $producto->id
+            'id' => $producto->id,
         ]);
     }
 }

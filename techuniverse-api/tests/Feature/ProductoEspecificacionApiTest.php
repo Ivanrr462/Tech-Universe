@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Producto;
 use App\Models\especificaciones;
+use App\Models\Producto;
 use App\Models\ProductoEspecificacion;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class ProductoEspecificacionApiTest extends TestCase
 {
@@ -29,9 +29,9 @@ class ProductoEspecificacionApiTest extends TestCase
         ]);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment([
-                     'message' => 'Especificacion añadida al producto'
-                 ]);
+            ->assertJsonFragment([
+                'message' => 'Especificacion añadida al producto',
+            ]);
 
         $this->assertDatabaseHas('producto_especificacions', [
             'producto_id' => $producto->id,
@@ -47,7 +47,7 @@ class ProductoEspecificacionApiTest extends TestCase
 
         $producto = Producto::factory()->create();
         $especificacion = especificaciones::factory()->create();
-        
+
         $productoEspec = ProductoEspecificacion::create([
             'producto_id' => $producto->id,
             'especificacion_id' => $especificacion->id,
@@ -59,9 +59,9 @@ class ProductoEspecificacionApiTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'message' => 'Especificacion actualizada'
-                 ]);
+            ->assertJsonFragment([
+                'message' => 'Especificacion actualizada',
+            ]);
 
         $this->assertDatabaseHas('producto_especificacions', [
             'id' => $productoEspec->id,
@@ -76,7 +76,7 @@ class ProductoEspecificacionApiTest extends TestCase
 
         $producto = Producto::factory()->create();
         $especificacion = especificaciones::factory()->create();
-        
+
         $productoEspec = ProductoEspecificacion::create([
             'producto_id' => $producto->id,
             'especificacion_id' => $especificacion->id,
@@ -86,9 +86,9 @@ class ProductoEspecificacionApiTest extends TestCase
         $response = $this->deleteJson("/api/especificacion/productos/{$productoEspec->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'message' => 'Especificacion eliminada del producto'
-                 ]);
+            ->assertJsonFragment([
+                'message' => 'Especificacion eliminada del producto',
+            ]);
 
         $this->assertDatabaseMissing('producto_especificacions', [
             'id' => $productoEspec->id,

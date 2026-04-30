@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class IsAdmin
 {
@@ -17,7 +16,7 @@ class IsAdmin
     {
         $user = $request->user();
 
-        if (!$user || $user->rol !== 'admin') {
+        if (! $user || $user->rol !== 'admin') {
             abort(403, 'Acceso denegado');
         }
 

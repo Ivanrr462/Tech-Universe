@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Producto;
 use App\Models\ProductoCesta;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -23,39 +22,54 @@ class ProductoCestaController extends Controller
      *     description="Añade un producto a la cesta del usuario autenticado. Si ya existe, incrementa la cantidad",
      *     tags={"Cesta Productos"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"producto_id", "cantidad"},
+     *
      *             @OA\Property(property="producto_id", type="integer", example=1),
      *             @OA\Property(property="cantidad", type="integer", minimum=1, example=2)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Producto añadido a la cesta",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Producto añadido a la cesta")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="No autenticado")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Cesta no encontrada",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Cesta no encontrada")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validacion",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="The producto_id field is required."),
      *             @OA\Property(property="errors", type="object")
      *         )
@@ -71,13 +85,13 @@ class ProductoCestaController extends Controller
 
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['error' => 'No autenticado'], 401);
         }
 
         $cesta = $user->cesta;
 
-        if (!$cesta) {
+        if (! $cesta) {
             return response()->json(['error' => 'Cesta no encontrada'], 404);
         }
 
@@ -109,38 +123,52 @@ class ProductoCestaController extends Controller
      *     description="Actualiza la cantidad de un producto especifico en la cesta del usuario autenticado",
      *     tags={"Cesta Productos"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del producto a actualizar",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"cantidad"},
+     *
      *             @OA\Property(property="cantidad", type="integer", minimum=1, example=3)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Cantidad actualizada correctamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Cantidad actualizada")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="No autenticado")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Producto no encontrado en la cesta",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Producto no encontrado en la cesta")
      *         )
      *     )
@@ -154,13 +182,13 @@ class ProductoCestaController extends Controller
 
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['error' => 'No autenticado'], 401);
         }
 
         $cesta = $user->cesta;
 
-        if (!$cesta) {
+        if (! $cesta) {
             return response()->json(['error' => 'Cesta no encontrada'], 404);
         }
 
@@ -168,7 +196,7 @@ class ProductoCestaController extends Controller
             ->where('producto_id', $id)
             ->first();
 
-        if (!$productoEnCesta) {
+        if (! $productoEnCesta) {
             return response()->json(['error' => 'Producto no encontrado en la cesta'], 404);
         }
 
@@ -185,31 +213,42 @@ class ProductoCestaController extends Controller
      *     description="Elimina un producto especifico de la cesta del usuario autenticado",
      *     tags={"Cesta Productos"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del producto a eliminar de la cesta",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Producto eliminado de la cesta",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Producto eliminado de la cesta")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="No autenticado")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Producto no encontrado en la cesta",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Producto no encontrado en la cesta")
      *         )
      *     )
@@ -219,13 +258,13 @@ class ProductoCestaController extends Controller
     {
         $user = request()->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['error' => 'No autenticado'], 401);
         }
 
         $cesta = $user->cesta;
 
-        if (!$cesta) {
+        if (! $cesta) {
             return response()->json(['error' => 'Cesta no encontrada'], 404);
         }
 
@@ -233,7 +272,7 @@ class ProductoCestaController extends Controller
             ->where('producto_id', $id)
             ->first();
 
-        if (!$productoEnCesta) {
+        if (! $productoEnCesta) {
             return response()->json(['error' => 'Producto no encontrado en la cesta'], 404);
         }
 

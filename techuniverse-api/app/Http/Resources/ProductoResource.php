@@ -23,9 +23,8 @@ class ProductoResource extends JsonResource
             'descripcion' => $this->descripcion,
             'creado' => $this->created_at->format('Y-m-d H:i:s'),
             'foto' => $this->foto
-                ? env('R2_PUBLIC_URL') . '/' . $this->foto
-                : null,
-
+                ? env('R2_PUBLIC_URL').'/'.$this->foto
+                : 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/dvEcf0VxtjxaHq3yAHBw9uQr4CW4keFw3GFAUvqa.jpg',
             'categoria' => $this->categoria ? [
                 'nombre' => $this->categoria->nombre,
             ] : null,

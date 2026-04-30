@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Producto;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class CestaApiTest extends TestCase
 {
@@ -28,18 +28,18 @@ class CestaApiTest extends TestCase
         $response = $this->getJson('/api/cesta');
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'data' => [
-                         'id',
-                         'usuario',
-                         'productos',
-                         'precio_total',
-                         'cantidad_total',
-                     ]
-                 ])
-                 ->assertJsonFragment([
-                     'precio_total' => 200,
-                     'cantidad_total' => 2,
-                 ]);
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'usuario',
+                    'productos',
+                    'precio_total',
+                    'cantidad_total',
+                ],
+            ])
+            ->assertJsonFragment([
+                'precio_total' => 200,
+                'cantidad_total' => 2,
+            ]);
     }
 }

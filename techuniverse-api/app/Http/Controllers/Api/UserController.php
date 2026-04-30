@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Http\Resources\UserResource;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
  * @OA\Schema(
  *     schema="Usuario",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Juan Garcia"),
  *     @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
@@ -31,11 +32,14 @@ class UserController extends Controller
      *     summary="Listar todos los usuarios",
      *     description="Retorna una lista de todos los usuarios registrados",
      *     tags={"Usuarios"},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Lista de usuarios obtenida correctamente",
+     *
      *         @OA\JsonContent(
      *             type="array",
+     *
      *             @OA\Items(ref="#/components/schemas/Usuario")
      *         )
      *     )
@@ -44,6 +48,7 @@ class UserController extends Controller
     public function index()
     {
         $usuario = User::get();
+
         return UserResource::collection($usuario);
     }
 
@@ -53,27 +58,36 @@ class UserController extends Controller
      *     summary="Crear un nuevo usuario",
      *     description="Crea un nuevo usuario con rol 'usuario' por defecto",
      *     tags={"Usuarios"},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name", "email", "password"},
+     *
      *             @OA\Property(property="name", type="string", maxLength=255, example="Juan Garcia"),
      *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
      *             @OA\Property(property="password", type="string", minLength=6, example="secret123")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Usuario creado con exito",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mensaje", type="string", example="Usuario creado con exito"),
      *             @OA\Property(property="data", ref="#/components/schemas/Usuario")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validacion",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="The email has already been taken."),
      *             @OA\Property(property="errors", type="object")
      *         )
@@ -95,7 +109,7 @@ class UserController extends Controller
 
         return response()->json([
             'mensaje' => 'Usuario creado con éxito',
-            'data' => new UserResource($usuario)
+            'data' => new UserResource($usuario),
         ], 201);
     }
 
@@ -105,22 +119,29 @@ class UserController extends Controller
      *     summary="Obtener un usuario por ID",
      *     description="Retorna un usuario especifico por su ID",
      *     tags={"Usuarios"},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del usuario",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Usuario encontrado",
+     *
      *         @OA\JsonContent(ref="#/components/schemas/Usuario")
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Usuario no encontrado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="No encontrado")
      *         )
      *     )
@@ -130,7 +151,7 @@ class UserController extends Controller
     {
         $usuario = User::find($id);
 
-        if (!$usuario) {
+        if (! $usuario) {
             return response()->json(['error' => 'No encontrado'], 404);
         }
 
@@ -143,41 +164,55 @@ class UserController extends Controller
      *     summary="Actualizar un usuario",
      *     description="Actualiza los datos de un usuario. Todos los campos son opcionales",
      *     tags={"Usuarios"},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del usuario a actualizar",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="name", type="string", maxLength=255, example="Juan Garcia"),
      *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
      *             @OA\Property(property="password", type="string", minLength=6, example="nuevapass123"),
      *             @OA\Property(property="role", type="string", enum={"usuario", "admin"}, example="admin")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Usuario actualizado con exito",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mensaje", type="string", example="Usuario actualizado con exito"),
      *             @OA\Property(property="data", ref="#/components/schemas/Usuario")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Usuario no encontrado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="No encontrado")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validacion",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="The email has already been taken."),
      *             @OA\Property(property="errors", type="object")
      *         )
@@ -190,9 +225,9 @@ class UserController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $id,
+            'email' => 'sometimes|email|unique:users,email,'.$id,
             'password' => 'sometimes|string|min:6',
-            'role' => 'sometimes|string|in:usuario,admin'
+            'role' => 'sometimes|string|in:usuario,admin',
         ]);
 
         if ($request->filled('password')) {
@@ -203,7 +238,7 @@ class UserController extends Controller
 
         return response()->json([
             'mensaje' => 'Usuario actualizado con éxito',
-            'data' => new UserResource($usuario)
+            'data' => new UserResource($usuario),
         ]);
     }
 
@@ -213,24 +248,32 @@ class UserController extends Controller
      *     summary="Eliminar un usuario",
      *     description="Elimina un usuario por su ID",
      *     tags={"Usuarios"},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del usuario a eliminar",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Usuario eliminado correctamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mensaje", type="string", example="Eliminado correctamente")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Usuario no encontrado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="No encontrado")
      *         )
      *     )
@@ -240,7 +283,7 @@ class UserController extends Controller
     {
         $usuario = User::find($id);
 
-        if (!$usuario) {
+        if (! $usuario) {
             return response()->json(['error' => 'No encontrado'], 404);
         }
 

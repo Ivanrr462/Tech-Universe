@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\Categoria;
 use App\Models\Producto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class CategoriaApiTest extends TestCase
 {
@@ -20,7 +20,7 @@ class CategoriaApiTest extends TestCase
         $response = $this->getJson('/api/categoria');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_puede_listar_categorias_con_productos()
@@ -32,7 +32,7 @@ class CategoriaApiTest extends TestCase
         $response = $this->getJson('/api/categoria/productos');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(1, 'data');
+            ->assertJsonCount(1, 'data');
     }
 
     public function test_puede_mostrar_categoria_con_productos()
@@ -44,7 +44,7 @@ class CategoriaApiTest extends TestCase
         $response = $this->getJson("/api/categoria/{$categoria->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonStructure(['data']);
+            ->assertJsonStructure(['data']);
     }
 
     public function test_devuelve_404_si_categoria_no_existe()
@@ -63,18 +63,18 @@ class CategoriaApiTest extends TestCase
         Sanctum::actingAs($admin, ['*']);
 
         $data = [
-            'nombre' => 'Nueva Categoria'
+            'nombre' => 'Nueva Categoria',
         ];
 
         $response = $this->postJson('/api/categoria', $data);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Categoria creada con éxito'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Categoria creada con éxito',
+            ]);
 
         $this->assertDatabaseHas('categorias', [
-            'nombre' => 'Nueva Categoria'
+            'nombre' => 'Nueva Categoria',
         ]);
     }
 
@@ -86,18 +86,18 @@ class CategoriaApiTest extends TestCase
         $categoria = Categoria::factory()->create();
 
         $data = [
-            'nombre' => 'Categoria Actualizada'
+            'nombre' => 'Categoria Actualizada',
         ];
 
         $response = $this->putJson("/api/categoria/{$categoria->id}", $data);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Actualizado correctamente'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Actualizado correctamente',
+            ]);
 
         $this->assertDatabaseHas('categorias', [
-            'nombre' => 'Categoria Actualizada'
+            'nombre' => 'Categoria Actualizada',
         ]);
     }
 
@@ -113,7 +113,7 @@ class CategoriaApiTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseMissing('categorias', [
-            'id' => $categoria->id
+            'id' => $categoria->id,
         ]);
     }
 }

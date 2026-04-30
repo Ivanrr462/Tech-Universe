@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 /**
@@ -12,8 +13,7 @@ namespace App\Http\Controllers;
  *     url=L5_SWAGGER_CONST_HOST,
  *     description="Servidor principal"
  * )
- * /**
- * 
+ *
  * @OA\SecurityScheme(
  *     securityScheme="bearerAuth",
  *     type="http",
@@ -21,7 +21,6 @@ namespace App\Http\Controllers;
  *     bearerFormat="JWT"
  * )
  */
-
 abstract class Controller
 {
     //

@@ -6,13 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductoCesta extends Model
 {
-    protected $fillable = ['cesta_id', 'producto_id', 'cantidad', 'precio_unitario']; 
+    protected $fillable = ['cesta_id', 'producto_id', 'cantidad', 'precio_unitario'];
 
-    public function cesta() {
+    public function cesta()
+    {
         return $this->belongsTo(Cesta::class);
     }
 
-    public function producto() {
+    public function producto()
+    {
         return $this->belongsTo(Producto::class);
     }
 }

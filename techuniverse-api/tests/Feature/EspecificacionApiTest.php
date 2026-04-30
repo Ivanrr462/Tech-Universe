@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\especificaciones;
 use App\Models\Producto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class EspecificacionApiTest extends TestCase
 {
@@ -20,14 +20,14 @@ class EspecificacionApiTest extends TestCase
         $response = $this->getJson('/api/especificacion');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_puede_listar_especificaciones_con_productos()
     {
         $especificacion = especificaciones::factory()->create();
         $producto = Producto::factory()->create();
-        
+
         $especificacion->productoEspecificaciones()->create([
             'producto_id' => $producto->id,
             'especificacion_id' => $especificacion->id,
@@ -37,14 +37,14 @@ class EspecificacionApiTest extends TestCase
         $response = $this->getJson('/api/especificacion/productos');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(1, 'data');
+            ->assertJsonCount(1, 'data');
     }
 
     public function test_puede_mostrar_especificacion_con_productos()
     {
         $especificacion = especificaciones::factory()->create();
         $producto = Producto::factory()->create();
-        
+
         $especificacion->productoEspecificaciones()->create([
             'especificacion_id' => $especificacion->id,
             'producto_id' => $producto->id,
@@ -54,7 +54,7 @@ class EspecificacionApiTest extends TestCase
         $response = $this->getJson("/api/especificacion/{$especificacion->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonStructure(['data']);
+            ->assertJsonStructure(['data']);
     }
 
     public function test_devuelve_404_si_especificacion_no_existe()
@@ -73,18 +73,18 @@ class EspecificacionApiTest extends TestCase
         Sanctum::actingAs($admin, ['*']);
 
         $data = [
-            'nombre' => 'Nueva Especificacion'
+            'nombre' => 'Nueva Especificacion',
         ];
 
         $response = $this->postJson('/api/especificacion', $data);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Especificacion creada con éxito'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Especificacion creada con éxito',
+            ]);
 
         $this->assertDatabaseHas('especificaciones', [
-            'nombre' => 'Nueva Especificacion'
+            'nombre' => 'Nueva Especificacion',
         ]);
     }
 
@@ -96,18 +96,18 @@ class EspecificacionApiTest extends TestCase
         $especificacion = especificaciones::factory()->create();
 
         $data = [
-            'nombre' => 'Especificacion Actualizada'
+            'nombre' => 'Especificacion Actualizada',
         ];
 
         $response = $this->putJson("/api/especificacion/{$especificacion->id}", $data);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Actualizado correctamente'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Actualizado correctamente',
+            ]);
 
         $this->assertDatabaseHas('especificaciones', [
-            'nombre' => 'Especificacion Actualizada'
+            'nombre' => 'Especificacion Actualizada',
         ]);
     }
 
@@ -123,7 +123,7 @@ class EspecificacionApiTest extends TestCase
         $response->assertStatus(200);
 
         $this->assertDatabaseMissing('especificaciones', [
-            'id' => $especificacion->id
+            'id' => $especificacion->id,
         ]);
     }
 }

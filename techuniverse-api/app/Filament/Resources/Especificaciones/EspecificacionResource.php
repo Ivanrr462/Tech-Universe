@@ -3,16 +3,15 @@
 namespace App\Filament\Resources\Especificaciones;
 
 use App\Models\especificaciones;
+use BackedEnum;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use BackedEnum;
-use App\Filament\Resources\Especificaciones\Pages;
+use Filament\Tables\Table;
 
 class EspecificacionResource extends Resource
 {

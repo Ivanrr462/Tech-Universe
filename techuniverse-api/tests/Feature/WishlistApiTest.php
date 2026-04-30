@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Producto;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class WishlistApiTest extends TestCase
 {
@@ -24,7 +24,7 @@ class WishlistApiTest extends TestCase
         $response = $this->getJson('/api/deseos');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(2, 'data');
+            ->assertJsonCount(2, 'data');
     }
 
     public function test_puede_mostrar_wishlist_de_un_usuario()
@@ -38,7 +38,7 @@ class WishlistApiTest extends TestCase
         $response = $this->getJson("/api/deseos/{$user->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonStructure(['data']);
+            ->assertJsonStructure(['data']);
     }
 
     public function test_devuelve_404_si_usuario_no_existe()
@@ -60,17 +60,17 @@ class WishlistApiTest extends TestCase
 
         $response = $this->postJson('/api/deseos', [
             'user_id' => $user->id,
-            'producto_id' => $producto->id
+            'producto_id' => $producto->id,
         ]);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Producto añadido a la wishlist'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Producto añadido a la wishlist',
+            ]);
 
         $this->assertDatabaseHas('producto_user', [
             'user_id' => $user->id,
-            'producto_id' => $producto->id
+            'producto_id' => $producto->id,
         ]);
     }
 
@@ -84,17 +84,17 @@ class WishlistApiTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         $response = $this->deleteJson("/api/deseos/{$producto->id}", [
-            'user_id' => $user->id
+            'user_id' => $user->id,
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Producto eliminado de la wishlist'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Producto eliminado de la wishlist',
+            ]);
 
         $this->assertDatabaseMissing('producto_user', [
             'user_id' => $user->id,
-            'producto_id' => $producto->id
+            'producto_id' => $producto->id,
         ]);
     }
 }

@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\especificaciones;
+use Illuminate\Database\Seeder;
 
 class EspecificacionSeeder extends Seeder
 {
@@ -13,6 +12,7 @@ class EspecificacionSeeder extends Seeder
      */
     public function run(): void
     {
+        // Especificaciones generales
         especificaciones::create(['nombre' => 'Procesador']);
         especificaciones::create(['nombre' => 'Memoria RAM']);
         especificaciones::create(['nombre' => 'Almacenamiento']);
@@ -21,5 +21,15 @@ class EspecificacionSeeder extends Seeder
         especificaciones::create(['nombre' => 'Cámara']);
         especificaciones::create(['nombre' => 'Peso']);
         especificaciones::create(['nombre' => 'Sistema Operativo']);
+        especificaciones::create(['nombre' => 'Resolución']);
+        especificaciones::create(['nombre' => 'Tamaño Pantalla']);
+        especificaciones::create(['nombre' => 'Frecuencia Refresco']);
+        especificaciones::create(['nombre' => 'Conectividad']);
+        especificaciones::create(['nombre' => 'Puertos']);
+        especificaciones::create(['nombre' => 'Duración Batería']);
+        especificaciones::create(['nombre' => 'Carga Rápida']);
+        especificaciones::create(['nombre' => 'Resistencia']);
+        especificaciones::create(['nombre' => 'Colores disponibles']);
+        especificaciones::create(['nombre' => 'Garantía']);
     }
 }

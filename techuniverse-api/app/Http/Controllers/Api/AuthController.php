@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * @OA\Tag(
@@ -22,27 +22,36 @@ class AuthController extends Controller
      *     summary="Registrar un nuevo usuario",
      *     description="Crea un nuevo usuario con rol 'usuario' y genera su cesta automaticamente. No devuelve token, el usuario debe hacer login despues",
      *     tags={"Auth"},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"name", "email", "password"},
+     *
      *             @OA\Property(property="name", type="string", maxLength=255, example="Juan Garcia"),
      *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
      *             @OA\Property(property="password", type="string", minLength=8, example="secret123")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Usuario registrado exitosamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mensaje", type="string", example="Usuario registrado exitosamente. Por favor inicia sesion."),
      *             @OA\Property(property="user", ref="#/components/schemas/Usuario")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validacion",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="The email has already been taken."),
      *             @OA\Property(property="errors", type="object")
      *         )
@@ -78,18 +87,24 @@ class AuthController extends Controller
      *     summary="Iniciar sesion",
      *     description="Autentica al usuario y devuelve un token Bearer. Redirige a /dashboard si es admin o /inicio si es usuario",
      *     tags={"Auth"},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"email", "password"},
+     *
      *             @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
      *             @OA\Property(property="password", type="string", example="secret123")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Login exitoso",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mensaje", type="string", example="Hola Juan Garcia"),
      *             @OA\Property(property="access_token", type="string", example="1|abc123xyz..."),
      *             @OA\Property(property="token_type", type="string", example="Bearer"),
@@ -97,10 +112,13 @@ class AuthController extends Controller
      *             @OA\Property(property="redireccion", type="string", example="/inicio")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Credenciales invalidas",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mensaje", type="string", example="Credenciales invalidas")
      *         )
      *     )
@@ -108,7 +126,7 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt($request->only('email', 'password'))) {
             return response()->json(['mensaje' => 'Credenciales inválidas'], 401);
         }
 
@@ -118,7 +136,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'mensaje' => 'Hola ' . $user->name,
+            'mensaje' => 'Hola '.$user->name,
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => $user,
@@ -133,17 +151,23 @@ class AuthController extends Controller
      *     description="Invalida el token Bearer del usuario autenticado",
      *     tags={"Auth"},
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Sesion cerrada correctamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mensaje", type="string", example="Sesion cerrada correctamente")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="No autenticado",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="mensaje", type="string", example="No autenticado")
      *         )
      *     )
@@ -152,6 +176,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
+
         return response()->json(['mensaje' => 'Sesión cerrada correctamente']);
     }
 }

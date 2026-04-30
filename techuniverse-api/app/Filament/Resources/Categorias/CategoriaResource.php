@@ -3,16 +3,15 @@
 namespace App\Filament\Resources\Categorias;
 
 use App\Models\Categoria;
+use BackedEnum;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use BackedEnum;
-use App\Filament\Resources\Categorias\Pages;
+use Filament\Tables\Table;
 
 class CategoriaResource extends Resource
 {

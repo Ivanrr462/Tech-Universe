@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Producto;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class ProductoCestaApiTest extends TestCase
 {
@@ -27,9 +27,9 @@ class ProductoCestaApiTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'message' => 'Producto añadido a la cesta'
-                 ]);
+            ->assertJsonFragment([
+                'message' => 'Producto añadido a la cesta',
+            ]);
 
         $this->assertDatabaseHas('producto_cestas', [
             'cesta_id' => $user->cesta->id,
@@ -57,9 +57,9 @@ class ProductoCestaApiTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'message' => 'Cantidad actualizada'
-                 ]);
+            ->assertJsonFragment([
+                'message' => 'Cantidad actualizada',
+            ]);
 
         $this->assertDatabaseHas('producto_cestas', [
             'cesta_id' => $user->cesta->id,
@@ -84,9 +84,9 @@ class ProductoCestaApiTest extends TestCase
         $response = $this->deleteJson("/api/cesta/productos/{$producto->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'message' => 'Producto eliminado de la cesta'
-                 ]);
+            ->assertJsonFragment([
+                'message' => 'Producto eliminado de la cesta',
+            ]);
 
         $this->assertDatabaseMissing('producto_cestas', [
             'cesta_id' => $user->cesta->id,

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class UsuarioApiTest extends TestCase
 {
@@ -21,7 +21,7 @@ class UsuarioApiTest extends TestCase
         $response = $this->getJson('/api/usuarios');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_puede_mostrar_un_usuario()
@@ -34,7 +34,7 @@ class UsuarioApiTest extends TestCase
         $response = $this->getJson("/api/usuarios/{$usuario->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonStructure(['data']);
+            ->assertJsonStructure(['data']);
     }
 
     public function test_devuelve_404_si_usuario_no_existe()
@@ -61,12 +61,12 @@ class UsuarioApiTest extends TestCase
         $response = $this->postJson('/api/usuarios', $data);
 
         $response->assertStatus(201)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Usuario creado con éxito'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Usuario creado con éxito',
+            ]);
 
         $this->assertDatabaseHas('users', [
-            'email' => 'juan@example.com'
+            'email' => 'juan@example.com',
         ]);
     }
 
@@ -85,12 +85,12 @@ class UsuarioApiTest extends TestCase
         $response = $this->putJson("/api/usuarios/{$usuario->id}", $data);
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Usuario actualizado con éxito'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Usuario actualizado con éxito',
+            ]);
 
         $this->assertDatabaseHas('users', [
-            'email' => 'nuevoemail@example.com'
+            'email' => 'nuevoemail@example.com',
         ]);
     }
 
@@ -104,12 +104,12 @@ class UsuarioApiTest extends TestCase
         $response = $this->deleteJson("/api/usuarios/{$usuario->id}");
 
         $response->assertStatus(200)
-                 ->assertJsonFragment([
-                     'mensaje' => 'Eliminado correctamente'
-                 ]);
+            ->assertJsonFragment([
+                'mensaje' => 'Eliminado correctamente',
+            ]);
 
         $this->assertDatabaseMissing('users', [
-            'id' => $usuario->id
+            'id' => $usuario->id,
         ]);
     }
 }

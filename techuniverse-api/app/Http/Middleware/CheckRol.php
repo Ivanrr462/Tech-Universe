@@ -15,7 +15,7 @@ class CheckRol
      */
     public function handle(Request $request, Closure $next, string $rol): Response
     {
-        if (!$request->user()) {
+        if (! $request->user()) {
             return response()->json(['mensaje' => 'No autenticado'], 401);
         }
 

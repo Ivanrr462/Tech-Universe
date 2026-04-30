@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Producto;
-use App\Models\especificaciones;
-use App\Models\ProductoEspecificacion;
 use App\Http\Resources\ProductoEspecificacionResource;
+use App\Models\especificaciones;
+use App\Models\Producto;
+use App\Models\ProductoEspecificacion;
+use Illuminate\Http\Request;
 
 /**
  * @OA\Tag(
@@ -18,6 +18,7 @@ use App\Http\Resources\ProductoEspecificacionResource;
  * @OA\Schema(
  *     schema="ProductoEspecificacion",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="producto_id", type="integer", example=1),
  *     @OA\Property(property="especificacion_id", type="integer", example=2),
@@ -28,31 +29,40 @@ class ProductoEspecifiacionController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/producto-especificaciones",
+     *     path="/api/producto/especificacion",
      *     summary="Añadir una especificacion a un producto",
      *     description="Asocia una especificacion con un valor a un producto",
      *     tags={"Producto Especificaciones"},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"producto_id", "especificacion_id", "valor"},
+     *
      *             @OA\Property(property="producto_id", type="integer", example=1),
      *             @OA\Property(property="especificacion_id", type="integer", example=2),
      *             @OA\Property(property="valor", type="string", maxLength=255, example="16GB")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=201,
      *         description="Especificacion añadida al producto",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Especificacion añadida al producto"),
      *             @OA\Property(property="data", ref="#/components/schemas/ProductoEspecificacion")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Error de validacion",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="The producto_id field is required."),
      *             @OA\Property(property="errors", type="object")
      *         )
@@ -75,42 +85,53 @@ class ProductoEspecifiacionController extends Controller
 
         return response()->json([
             'message' => 'Especificacion añadida al producto',
-            'data' => new ProductoEspecificacionResource($productoPecificacion)
+            'data' => new ProductoEspecificacionResource($productoPecificacion),
         ], 201);
     }
 
     /**
      * @OA\Put(
-     *     path="/api/producto-especificaciones/{id}",
+     *     path="/api/producto/especificacion/{id}",
      *     summary="Actualizar el valor de una especificacion de un producto",
      *     description="Actualiza el valor de una especificacion asociada a un producto",
      *     tags={"Producto Especificaciones"},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del registro producto-especificacion",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"valor"},
+     *
      *             @OA\Property(property="valor", type="string", maxLength=255, example="32GB")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Especificacion actualizada correctamente",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Especificacion actualizada"),
      *             @OA\Property(property="data", ref="#/components/schemas/ProductoEspecificacion")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Especificacion no encontrada en el producto",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Especificacion no encontrada en el producto")
      *         )
      *     )
@@ -124,7 +145,7 @@ class ProductoEspecifiacionController extends Controller
 
         $productoEspecificacion = ProductoEspecificacion::find($id);
 
-        if (!$productoEspecificacion) {
+        if (! $productoEspecificacion) {
             return response()->json(['error' => 'Especificacion no encontrada en el producto'], 404);
         }
 
@@ -133,34 +154,42 @@ class ProductoEspecifiacionController extends Controller
 
         return response()->json([
             'message' => 'Especificacion actualizada',
-            'data' => new ProductoEspecificacionResource($productoEspecificacion)
+            'data' => new ProductoEspecificacionResource($productoEspecificacion),
         ]);
     }
 
     /**
      * @OA\Delete(
-     *     path="/api/producto-especificaciones/{id}",
+     *     path="/api/producto/especificacion/{id}",
      *     summary="Eliminar una especificacion de un producto",
      *     description="Elimina la asociacion entre una especificacion y un producto",
      *     tags={"Producto Especificaciones"},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID del registro producto-especificacion a eliminar",
+     *
      *         @OA\Schema(type="integer", example=1)
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Especificacion eliminada del producto",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="message", type="string", example="Especificacion eliminada del producto")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="Especificacion no encontrada",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Especificacion no encontrada")
      *         )
      *     )
@@ -170,7 +199,7 @@ class ProductoEspecifiacionController extends Controller
     {
         $productoEspecificacion = ProductoEspecificacion::find($id);
 
-        if (!$productoEspecificacion) {
+        if (! $productoEspecificacion) {
             return response()->json(['error' => 'Especificacion no encontrada'], 404);
         }
 

@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use Database\Factories\EspecificacionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Database\Factories\EspecificacionFactory;
 
 class especificaciones extends Model
 {
     use HasFactory;
 
     protected $table = 'especificaciones';
+
     protected $fillable = ['nombre'];
 
     protected static function newFactory(): EspecificacionFactory

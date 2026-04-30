@@ -1,42 +1,54 @@
-# Proyecto-E-commerce
+# Tech Universe
 
-Rama -> develop
+## Índice
 
+- [Descripción del proyecto](#descripción-del-proyecto)
+- [Miembros](#miembros)
+- [Partes del proyecto](#partes-del-proyecto)
+  - [Frontend Angular](#frontend-angular)
+  - [Frontend React](#frontend-react)
+  - [Backend Laravel](#backend-laravel)
+  - [Despliegue](#despliegue)
+- [Ramas](#ramas)
+- [Diseño y diagramas](#diseño-y-diagramas)
 
+## Descripción del proyecto
 
+TechUniverse es un e-commerce tecnológico. Este trabajo constituye el Trabajo de Fin de Grado (TFG) del grado superior de Desarrollo de Aplicaciones Web. El objetivo de nuestro proyecto es crear un e-commerce que incluya la parte pública, el panel del administrador, una API que sirva datos al e-commerce y un despliegue en AWS.
 
-Walkthrough - TechUniverse AWS Deployment
-✅ Despliegue Completado Exitosamente
+## Miembros
 
-Tu servidor EC2 se está iniciando y configurando automáticamente.
+- Iván Ríos Raya
+- Alexander Sánchez Jara
 
-🚀 Datos de Conexión
-Recurso	Valor / Comando
-IP Pública	54.237.57.59
-API URL	http://54.237.57.59:8080/api
-SSH Acceso	ssh -i vockey.pem ubuntu@54.237.57.59
-phpMyAdmin	ssh -i vockey.pem -L 8081:localhost:8081 ubuntu@54.237.57.59
-⏳ ¿Qué está pasando ahora?
-El servidor tarda unos 3-5 minutos en ejecutar el script de configuración inicial (User Data). Este script está:
+## Partes del proyecto
 
-Actualizando el sistema (apt update)
-Instalando Docker y Git
-Clonando tu repositorio APITest
-Levantando los contenedores
-🔍 Verificación
-Para ver el progreso en tiempo real, conéctate por SSH y ejecuta:
+### Frontend Angular
 
-# 1. Conectar por SSH
-ssh -i vockey.pem ubuntu@54.237.57.59
-# 2. Ver el log del script de inicio
-tail -f /var/log/user-data.log
-# 3. Ver estado de los contenedores
-sudo docker ps
-Si todo ha ido bien, deberías ver 3 contenedores corriendo (web_techuniverse, db_techuniverse, pma_techuniverse).
+### Frontend React
 
-🛠 Troubleshooting
-Si la API no responde en 5 minutos:
+### Backend Laravel
 
-Verifica el log: cat /var/log/user-data.log
-Verifica si se clonó el repo: ls -la /home/ubuntu/backend
-Verifica logs de docker: cd /home/ubuntu/backend && sudo docker compose logs
+API REST creado en Laravel con autenticación, gestión de usuarios, productos, categorías, especificaciones, carrito y lista de deseos. Utiliza Sanctum para la seguridad y Filament para un panel de administrador.
+
+> Puedes leer la documentacion de la API en: [Documentación]("https://ivan123.alwaysdata.net/a"pi/documentation/")
+> Puedes irte también al repo original donde se ha desarrollado toda la API: [Repo]("https://github.com/Ivanrr462/API-TechUniverse")
+
+### Despliegue
+
+Aunque el despliegue de la aplicación no este implementado por ahora, la intención es utilizar Terraform , Github Actions y AWS para automatizar la infraestructura y la subida de código. 
+
+Igualmente la API esta subida en AlwaysData mientras se hace el despliegue de la aplicación.
+> Enlace a la API: [API]("https://ivan123.alwaysdata.net/api/productos")
+
+## Ramas
+
+El proyecto sigue una estrategia de ramas sencilla:
+
+- `main`: rama estable y lista para producción.
+- `develop`: rama de integración y pruebas.
+
+## Diseño y diagramas
+
+- **Figma**: [Enlace-al-figma]("https://www.figma.com/design/CdztUWth7lbVUKpVMSYNvb/Proyecto-Intermodular?node-id=0-1&p=f&t=3Ktj0fuLzQOQryqP-0")
+- **Draw.io**: [Modelo-E/R]("https://app.diagrams.net/#G1vMNrhgW8aM7IMlQlUvtK2p8JPdPG2GnY#%7B%22pageId%22%3A%22xxhzdqV2dHcMtNHvoPZn%22%7D")
