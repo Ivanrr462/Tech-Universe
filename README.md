@@ -25,6 +25,10 @@ TechUniverse es un e-commerce tecnológico. Este trabajo constituye el Trabajo d
 
 ### Frontend Angular
 
+E-commerce desarrollado en Angular 21 con Angular Material, Tailwind CSS y arquitectura standalone. Incluye catálogo de productos, detalle de producto, carrito de compra, lista de deseos, autenticación y panel de búsqueda y filtrado por categorías.
+
+> Puedes ver la documentación detallada del proyecto Angular en: [`README Frontend Angular`](./Angular-frontend/README.md)
+
 ### Frontend React
 
 ### Backend Laravel

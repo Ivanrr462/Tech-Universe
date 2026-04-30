@@ -1,59 +1,152 @@
-# TechCartQuestAngular
+# Frontend Angular — TechUniverse
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.1.
+E-commerce de tecnología desarrollado en **Angular 21** con componentes standalone, Angular Material, Tailwind CSS y comunicación con la [API REST de TechUniverse](https://ivan123.alwaysdata.net/api/documentation/).
 
-## Development server
+---
 
-To start a local development server, run:
+## Índice
 
-```bash
-ng serve
+- [Tecnologías](#tecnologías)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Páginas y rutas](#páginas-y-rutas)
+- [Componentes](#componentes)
+- [Servicios](#servicios)
+- [Modelos](#modelos)
+- [Puesta en marcha](#puesta-en-marcha)
+- [Proxy API](#proxy-api)
+
+---
+
+## Tecnologías
+
+| Tecnología | Versión | Uso |
+|---|---|---|
+| Angular | 21 | Framework principal |
+| Angular Material | 21 | Componentes UI |
+| Tailwind CSS | 3 | Estilos utilitarios |
+| TypeScript | 5.9 | Lenguaje |
+| RxJS | 7.8 | Programación reactiva |
+| Lucide Angular | latest | Iconografía |
+
+---
+
+## Estructura del proyecto
+
+```
+src/app/
+├── pages/            # Vistas principales (lazy-loaded)
+│   ├── home/
+│   ├── category/
+│   ├── product-detail/
+│   ├── cart/
+│   ├── checkout/
+│   ├── auth/
+│   ├── search/
+│   ├── wishlist/
+│   └── not-found/
+├── components/       # Componentes reutilizables
+│   ├── navbar/
+│   ├── product-card/
+│   ├── pagination/
+│   ├── theme-toggle/
+│   └── toast/
+├── services/         # Lógica de negocio e integración API
+├── models/           # Interfaces TypeScript
+└── interceptors/     # Interceptor JWT
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## Páginas y rutas
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+| Ruta | Página | Descripción |
+|---|---|---|
+| `/` | Home | Portada con productos destacados |
+| `/category/:category` | Category | Listado de productos por categoría con paginación |
+| `/product/:id` | ProductDetail | Detalle de producto con especificaciones |
+| `/cart` | Cart | Carrito de compra |
+| `/checkout` | Checkout | Formulario de finalización de compra |
+| `/auth` | Auth | Login y registro |
+| `/search` | Search | Resultados de búsqueda |
+| `/wishlist` | Wishlist | Lista de deseos del usuario |
+| `**` | NotFound | Página 404 |
+
+Todas las rutas usan **lazy loading** mediante `loadComponent()`.
+
+---
+
+## Componentes
+
+| Componente | Descripción |
+|---|---|
+| `navbar` | Barra de navegación con buscador, acceso a carrito, wishlist y sesión |
+| `product-card` | Tarjeta de producto reutilizable con botón de añadir a favoritos |
+| `pagination` | Paginación genérica para listados |
+| `theme-toggle` | Alternador de tema claro/oscuro |
+| `toast` | Notificaciones emergentes de éxito y error |
+
+---
+
+## Servicios
+
+| Servicio | Responsabilidad |
+|---|---|
+| `AuthService` | Login, registro, logout y persistencia de sesión con JWT |
+| `ProductService` | Consulta de productos, categorías y búsqueda |
+| `CartService` | Gestión del carrito (añadir, eliminar, vaciar) |
+| `WishlistService` | Lista de deseos sincronizada con la API (`/api/deseos`) |
+| `ThemeService` | Persistencia y aplicación del tema claro/oscuro |
+| `ToastService` | Emisión de notificaciones globales |
+
+El interceptor `auth.interceptor.ts` adjunta automáticamente el token JWT en todas las peticiones a la API.
+
+---
+
+## Modelos
+
+| Modelo | Campos principales |
+|---|---|
+| `Product` | `id`, `nombre`, `precio`, `foto`, `categoria`, `especificaciones` |
+| `User` | `id`, `name`, `email` |
+| `CartItem` | `productId`, `name`, `price`, `image`, `quantity` |
+| `WishlistItem` | `productId`, `name`, `price`, `image`, `category` |
+
+---
+
+## Puesta en marcha
+
+**Requisitos:** Node.js 20+ y npm 11+
 
 ```bash
-ng generate component component-name
+# Instalar dependencias
+npm install
+
+# Servidor de desarrollo (con proxy a la API)
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+La aplicación estará disponible en `http://localhost:4200`.
 
 ```bash
-ng generate --help
+# Build de producción
+npm run build
+
+# Ejecutar tests
+npm test
 ```
 
-## Building
+---
 
-To build the project run:
+## Proxy API
 
-```bash
-ng build
+En desarrollo, las peticiones a `/api/*` se redirigen automáticamente a la API desplegada para evitar problemas de CORS:
+
+```json
+{
+  "/api": {
+    "target": "https://ivan123.alwaysdata.net",
+    "secure": true,
+    "changeOrigin": true
+  }
+}
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
