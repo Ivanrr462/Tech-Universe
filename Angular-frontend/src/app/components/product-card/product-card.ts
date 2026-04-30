@@ -1,8 +1,11 @@
 import { Component, Input, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, ShoppingCart, Heart } from 'lucide-angular';
 import { CartService } from '@services/cart.service';
+import { WishlistService } from '@services/wishlist.service';
+import { AuthService } from '@services/auth.service';
 import { ToastService } from '@services/toast.service';
 
 @Component({
@@ -23,20 +26,39 @@ export class ProductCard {
   @Input() discount?: number;
 
   private cartService = inject(CartService);
+  private wishlistService = inject(WishlistService);
+  private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private router = inject(Router);
 
-  // Icon references for template
   readonly ShoppingCartIcon = ShoppingCart;
   readonly HeartIcon = Heart;
 
+  get inWishlist(): boolean {
+    return this.wishlistService.isInWishlist(this.id);
+  }
+
   handleAddToCart(event: Event): void {
     event.preventDefault();
-    this.cartService.addItem({
-      id: this.id,
-      name: this.name,
-      price: this.price,
-      image: this.image,
-    });
-    this.toastService.success('Producto añadido al carrito');
+    if (!this.authService.getToken()) {
+      this.toastService.info('Inicia sesión para añadir al carrito');
+      this.router.navigate(['/auth']);
+      return;
+    }
+    this.cartService.addItem(this.id, this.name, this.price, this.image);
+  }
+
+  toggleWishlist(event: Event): void {
+    event.preventDefault();
+    if (!this.authService.getToken()) {
+      this.toastService.info('Inicia sesión para guardar en favoritos');
+      this.router.navigate(['/auth']);
+      return;
+    }
+    if (this.inWishlist) {
+      this.wishlistService.removeFromWishlist(this.id);
+    } else {
+      this.wishlistService.addToWishlist(this.id, this.name, this.price, this.image, this.category);
+    }
   }
 }

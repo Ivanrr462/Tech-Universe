@@ -218,8 +218,4 @@ php artisan test
 
 ## 📝 Créditos
 
-Desarrollado por [Iván Ríos](https://github.com/Ivanrr462) como Backend del TFG para DAW.
-
-## 📄 Licencia
-
-Este proyecto es de código abierto bajo la licencia MIT.
+Para ver el repo original irse a [Repo](https://github.com/Ivanrr462/API-TechUniverse)

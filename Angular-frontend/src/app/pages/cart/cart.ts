@@ -1,7 +1,8 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CartService } from '@services/cart.service';
+import { AuthService } from '@services/auth.service';
 import { LucideAngularModule, Trash2, Minus, Plus, ArrowRight, ShoppingBag } from 'lucide-angular';
 
 @Component({
@@ -13,6 +14,8 @@ import { LucideAngularModule, Trash2, Minus, Plus, ArrowRight, ShoppingBag } fro
 })
 export class Cart {
     cartService = inject(CartService);
+    private authService = inject(AuthService);
+    private router = inject(Router);
 
     // Icon references
     readonly TrashIcon = Trash2;
@@ -33,4 +36,12 @@ export class Cart {
     total = computed(() => {
         return this.cartService.subtotal() + this.tax() + this.shippingCost();
     });
+
+    proceedToCheckout(): void {
+        if (this.authService.getToken()) {
+            this.router.navigate(['/checkout']);
+        } else {
+            this.router.navigate(['/auth']);
+        }
+    }
 }

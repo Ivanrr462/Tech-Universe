@@ -1,36 +1,44 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown } from 'lucide-angular';
-import { ThemeToggle } from '../theme-toggle/theme-toggle';
+import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, LogOut, Heart } from 'lucide-angular';
+import { ThemeService } from '@services/theme.service';
 import { CartService } from '@services/cart.service';
+import { AuthService } from '@services/auth.service';
+import { WishlistService } from '@services/wishlist.service';
 import { CATEGORIES } from '@models/product.model';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterLink,
+    RouterLinkActive,
     FormsModule,
-    LucideAngularModule,
-    ThemeToggle
+    LucideAngularModule
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
 export class Navbar {
   private router = inject(Router);
   cartService = inject(CartService);
+  authService = inject(AuthService);
+  themeService = inject(ThemeService);
+  wishlistService = inject(WishlistService);
 
-  // Icon references
   readonly SearchIcon = Search;
   readonly ShoppingCartIcon = ShoppingCart;
   readonly UserIcon = User;
   readonly MenuIcon = Menu;
   readonly ChevronDownIcon = ChevronDown;
+  readonly LogOutIcon = LogOut;
+  readonly HeartIcon = Heart;
 
   searchQuery = '';
   categories = CATEGORIES;

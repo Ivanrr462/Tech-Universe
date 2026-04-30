@@ -1,17 +1,20 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from '@services/auth.service';
+import { ToastService } from '@services/toast.service';
 import { CartItem } from '@models/cart-item.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
-  // Private writable signal for items
-  private itemsSignal = signal<CartItem[]>([]);
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
-  // Public readonly signal for items
+  private itemsSignal = signal<CartItem[]>([]);
   readonly items = this.itemsSignal.asReadonly();
 
-  // Computed signals for derived state
   readonly totalItems = computed(() =>
     this.items().reduce((sum, item) => sum + item.quantity, 0)
   );
@@ -20,32 +23,76 @@ export class CartService {
     this.items().reduce((sum, item) => sum + item.price * item.quantity, 0)
   );
 
-  addItem(newItem: Omit<CartItem, 'quantity'>): void {
-    this.itemsSignal.update(items => {
-      const existingItem = items.find(item => item.id === newItem.id);
-      if (existingItem) {
-        return items.map(item =>
-          item.id === newItem.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
+  constructor() {
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.loadCart();
+      } else {
+        this.itemsSignal.set([]);
       }
-      return [...items, { ...newItem, quantity: 1 }];
     });
   }
 
-  removeItem(id: string): void {
-    this.itemsSignal.update(items => items.filter(item => item.id !== id));
+  loadCart(): void {
+    this.http.get<any>('/api/cesta').subscribe({
+      next: (response) => {
+        const cestaProductos = response.data?.productos || [];
+        this.itemsSignal.set(
+          cestaProductos.map((cp: any) => ({
+            cestaProductoId: cp.id,
+            productId: cp.producto_id?.toString() ?? cp.id?.toString(),
+            name: cp.nombre ?? '',
+            price: parseFloat(cp.precio_unitario) || 0,
+            image: cp.foto ?? cp.imagen ?? '',
+            quantity: cp.cantidad,
+          }))
+        );
+      },
+      error: () => {}
+    });
   }
 
-  updateQuantity(id: string, delta: number): void {
-    this.itemsSignal.update(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    );
+  addItem(productId: string, name: string, price: number, image: string): void {
+    const existing = this.itemsSignal().find(i => i.productId === productId);
+    if (existing) {
+      this.updateQuantity(existing.cestaProductoId, existing.quantity + 1);
+      return;
+    }
+
+    this.http.post<any>('/api/cesta/productos', { producto_id: Number(productId), cantidad: 1 }).subscribe({
+      next: () => {
+        this.loadCart();
+        this.toastService.success('Producto añadido al carrito');
+      },
+      error: () => this.toastService.error('Error al añadir al carrito')
+    });
+  }
+
+  updateQuantity(cestaProductoId: number, newQuantity: number): void {
+    if (newQuantity < 1) return;
+    this.http.put<any>(`/api/cesta/productos/${cestaProductoId}`, { cantidad: newQuantity }).subscribe({
+      next: () => {
+        this.itemsSignal.update(items =>
+          items.map(item =>
+            item.cestaProductoId === cestaProductoId
+              ? { ...item, quantity: newQuantity }
+              : item
+          )
+        );
+      },
+      error: () => this.toastService.error('Error al actualizar la cantidad')
+    });
+  }
+
+  removeItem(cestaProductoId: number): void {
+    this.http.delete<any>(`/api/cesta/productos/${cestaProductoId}`).subscribe({
+      next: () => {
+        this.itemsSignal.update(items =>
+          items.filter(item => item.cestaProductoId !== cestaProductoId)
+        );
+      },
+      error: () => this.toastService.error('Error al eliminar el producto')
+    });
   }
 
   clearCart(): void {
