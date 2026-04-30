@@ -31,6 +31,8 @@ E-commerce desarrollado en Angular 21 con Angular Material, Tailwind CSS y arqui
 
 ### Frontend React
 
+Componentes desarrollados en React e integrados en la aplicación Angular como micro-frontends compilados. Incluye un **chatbot** de asistencia al usuario y un **switch de tema** (claro/oscuro) que se comunica con el resto de la aplicación.
+
 ### Backend Laravel
 
 API REST creado en Laravel con autenticación, gestión de usuarios, productos, categorías, especificaciones, carrito y lista de deseos. Utiliza Sanctum para la seguridad y Filament para un panel de administrador.
