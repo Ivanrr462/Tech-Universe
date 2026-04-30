@@ -1,0 +1,25 @@
+@if (lastPage > 1) {
+  <div class="flex items-center justify-center gap-4 mt-8">
+    <button
+      (click)="prev()"
+      [disabled]="currentPage <= 1"
+      class="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-border text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      <lucide-icon [img]="ChevronLeftIcon" class="h-4 w-4"></lucide-icon>
+      Anterior
+    </button>
+
+    <span class="text-sm text-muted-foreground">
+      Página <span class="font-semibold text-foreground">{{ currentPage }}</span> de <span class="font-semibold text-foreground">{{ lastPage }}</span>
+    </span>
+
+    <button
+      (click)="next()"
+      [disabled]="currentPage >= lastPage"
+      class="inline-flex items-center gap-1 px-4 py-2 rounded-lg border border-border text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-40 disabled:cursor-not-allowed"
+    >
+      Siguiente
+      <lucide-icon [img]="ChevronRightIcon" class="h-4 w-4"></lucide-icon>
+    </button>
+  </div>
+}

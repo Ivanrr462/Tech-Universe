@@ -1,0 +1,77 @@
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <a routerLink="/" class="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors mb-4">
+            <lucide-icon [img]="ArrowLeftIcon" class="w-4 h-4 mr-2"></lucide-icon>
+            Volver al inicio
+        </a>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            <lucide-icon [img]="HeartIcon" class="w-8 h-8 text-red-500"></lucide-icon>
+            Lista de Deseos
+        </h1>
+        @if (wishlistService.items().length > 0) {
+            <p class="text-gray-600 dark:text-gray-400 mt-1">
+                {{ wishlistService.items().length }} {{ wishlistService.items().length === 1 ? 'producto guardado' : 'productos guardados' }}
+            </p>
+        }
+    </div>
+
+    @if (wishlistService.items().length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @for (item of wishlistService.items(); track item.productId) {
+                <div class="group relative overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm hover:border-primary/50 transition-all duration-300">
+                    <!-- Product Image -->
+                    <a [routerLink]="['/product', item.productId]">
+                        <div class="aspect-square overflow-hidden bg-muted">
+                            <img
+                                [src]="item.image"
+                                [alt]="item.name"
+                                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            />
+                        </div>
+                    </a>
+
+                    <!-- Card Content -->
+                    <div class="p-4">
+                        <p class="text-xs text-muted-foreground mb-1">{{ item.category }}</p>
+                        <a [routerLink]="['/product', item.productId]">
+                            <h3 class="font-semibold line-clamp-2 hover:text-primary transition-colors">{{ item.name }}</h3>
+                        </a>
+                        <p class="mt-2 text-2xl font-bold text-primary">{{ item.price }}€</p>
+                    </div>
+
+                    <!-- Card Footer -->
+                    <div class="p-4 pt-0 flex gap-2">
+                        <button
+                            (click)="addToCart(item.productId, item.name, item.price, item.image)"
+                            class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors gradient-primary text-primary-foreground hover:opacity-90 h-9 px-3"
+                        >
+                            <lucide-icon [img]="ShoppingCartIcon" class="h-4 w-4 mr-1"></lucide-icon>
+                            Al carrito
+                        </button>
+                        <button
+                            (click)="removeFromWishlist(item.productId)"
+                            class="inline-flex items-center justify-center rounded-md h-9 w-9 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                            title="Eliminar de favoritos"
+                        >
+                            <lucide-icon [img]="TrashIcon" class="h-4 w-4"></lucide-icon>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    } @else {
+        <div class="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-6">
+            <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                <lucide-icon [img]="HeartIcon" class="w-12 h-12 text-gray-400"></lucide-icon>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Tu lista de deseos está vacía</h2>
+            <p class="text-gray-600 dark:text-gray-400 max-w-md">
+                Guarda los productos que te gusten para encontrarlos fácilmente más tarde.
+            </p>
+            <a routerLink="/"
+                class="inline-flex items-center gap-2 px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-xl transition-all hover:shadow-lg shadow-violet-600/20">
+                Explorar productos
+            </a>
+        </div>
+    }
+</div>
