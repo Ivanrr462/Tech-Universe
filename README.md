@@ -35,7 +35,7 @@ E-commerce desarrollado en Angular 21 con Angular Material, Tailwind CSS y arqui
 
 API REST creado en Laravel con autenticación, gestión de usuarios, productos, categorías, especificaciones, carrito y lista de deseos. Utiliza Sanctum para la seguridad y Filament para un panel de administrador.
 
-> Puedes leer la documentacion de la API en: [`Documentacion`](https://ivan123.alwaysdata.net/api/documentation/)
+> Puedes leer la documentación de la API en: [`Documentación`](https://ivan123.alwaysdata.net/api/documentation/)
 
 > Puedes irte también al repo original donde se ha desarrollado toda la API: [`Repo`](https://github.com/Ivanrr462/API-TechUniverse)
 
@@ -58,3 +58,4 @@ El proyecto sigue una estrategia de ramas sencilla:
 
 - **Figma**: [`Enlace-al-figma`](https://www.figma.com/design/CdztUWth7lbVUKpVMSYNvb/Proyecto-Intermodular?node-id=0-1&p=f&t=3Ktj0fuLzQOQryqP-0)
 - **Draw.io**: [`Modelo-E/R`](https://app.diagrams.net/#G1vMNrhgW8aM7IMlQlUvtK2p8JPdPG2GnY#%7B%22pageId%22%3A%22xxhzdqV2dHcMtNHvoPZn%22%7D)
+- **Tablero Trello**: [`Trello`](https://trello.com/invite/b/697b4853d8ecbe0e5996204b/ATTIc810d1fd18a816186cc78a2e81e4ce46EBBE5D9A/tfg)
