@@ -31,7 +31,7 @@ TechUniverse es un e-commerce tecnológico. Este trabajo constituye el Trabajo d
 
 API REST creado en Laravel con autenticación, gestión de usuarios, productos, categorías, especificaciones, carrito y lista de deseos. Utiliza Sanctum para la seguridad y Filament para un panel de administrador.
 
-> Puedes leer la documentacion de la API en: [`Documentacion`](https://ivan123.alwaysdata.net/api/documentation/)
+> Puedes leer la documentación de la API en: [`Documentación`](https://ivan123.alwaysdata.net/api/documentation/)
 
 > Puedes irte también al repo original donde se ha desarrollado toda la API: [`Repo`](https://github.com/Ivanrr462/API-TechUniverse)
 
