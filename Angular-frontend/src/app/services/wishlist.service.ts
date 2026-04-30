@@ -30,16 +30,16 @@ export class WishlistService {
   }
 
   loadWishlist(userId: number): void {
-    this.http.get<any>(`/api/wishlist/${userId}`).subscribe({
+    this.http.get<any>(`/api/deseos/${userId}`).subscribe({
       next: (response) => {
-        const data = Array.isArray(response) ? response : (response.data || []);
+        const data: any[] = response.desea ?? [];
         this.itemsSignal.set(
           data.map((entry: any) => ({
-            productId: (entry.producto_id ?? entry.producto?.id)?.toString(),
-            name: entry.producto?.nombre,
-            price: entry.producto?.precio,
-            image: entry.producto?.foto,
-            category: entry.producto?.categoria?.nombre || 'General',
+            productId: entry.id?.toString(),
+            name: entry.nombre,
+            price: entry.precio,
+            image: entry.foto,
+            category: entry.categoria?.nombre || 'General',
           }))
         );
       },
@@ -48,7 +48,8 @@ export class WishlistService {
   }
 
   addToWishlist(productId: string, name: string, price: number, image: string, category: string): void {
-    this.http.post<any>('/api/wishlist', { producto_id: Number(productId) }).subscribe({
+    const userId = this.authService.currentUserValue?.id;
+    this.http.post<any>('/api/deseos', { producto_id: Number(productId), user_id: userId }).subscribe({
       next: () => {
         this.itemsSignal.update(items => [...items, { productId, name, price, image, category }]);
         this.toastService.success('Añadido a favoritos');
@@ -58,7 +59,8 @@ export class WishlistService {
   }
 
   removeFromWishlist(productId: string): void {
-    this.http.delete<any>(`/api/wishlist/${productId}`).subscribe({
+    const userId = this.authService.currentUserValue?.id;
+    this.http.delete<any>(`/api/deseos/${productId}`, { body: { user_id: userId } }).subscribe({
       next: () => {
         this.itemsSignal.update(items => items.filter(i => i.productId !== productId));
         this.toastService.success('Eliminado de favoritos');
