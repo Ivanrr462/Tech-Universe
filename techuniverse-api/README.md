@@ -97,71 +97,6 @@ La API estará disponible en `http://localhost:8000`
 
 ---
 
-## 📌 Control de Versiones
-
-Este proyecto sigue un esquema de versionado semántico adaptado al desarrollo del TFG.  
-Cada versión refleja nuevas funcionalidades, mejoras internas y cambios en la arquitectura del backend.
-
----
-
-### 🟩 Versión **1.0.0** — Publicación Inicial
-
-Primera versión estable de la API TechUniverse, que incluye:
-
-#### 🔧 Core del Backend
-- CRUD completo para:
-  - Productos  
-  - Categorías  
-  - Especificaciones técnicas  
-  - Usuarios
-- Relaciones entre entidades totalmente implementadas.
-- Validación robusta en endpoints.
-- Respuestas JSON estandarizadas.
-
-#### 🔐 Autenticación y Seguridad
-- Autenticación basada en tokens con **Laravel Sanctum**.
-- Middleware de protección para rutas sensibles.
-
-#### 🛒 Funcionalidades de E‑commerce
-- Carrito de compra (Cesta)
-- Wishlist (Lista de deseos)
-- Gestión de stock y disponibilidad
-
-#### 🧱 Panel de Administración
-- Panel admin construido con **FilamentPHP**:
-  - Gestión visual de productos, categorías, especificaciones y usuarios
-  - Acceso restringido a administradores
-  - Formularios y tablas dinámicas
-
-#### 📘 Documentación API
-- Documentación completa con **Swagger (OpenAPI 3.0)** usando L5‑Swagger.
-- Endpoints documentados con ejemplos de request/response.
-- Generación automática del archivo `api-docs.json`.
-
----
-
-### 🟦 Versión **1.1.0** — Próximas Mejoras (En Desarrollo)
-
-Esta sección está preparada para futuras actualizaciones.
-
-#### 🔄 Mejoras Planificadas (Roadmap 1.1)
-- 🔜 **Count en listados**
-  - Devolver el número total de productos en respuestas paginadas.
-  - Útil para interfaces que muestran resultados dinámicos.
-
-- 🔜 **Ordenación por precio**
-  - `?sort=price_asc`
-  - `?sort=price_desc`
-
-- 🔜 **Ordenación por novedad**
-  - Ordenar por fecha de creación o actualización.
-  - Ideal para mostrar “lo último añadido”.
-
-- 🔜 **Búsqueda de productos**
-  - Búsqueda por nombre, categoría o especificaciones.
-  - Preparado para futura búsqueda avanzada (1.2+).
----
-
 ## 🏗️ Estructura del Proyecto
 
 ```
@@ -214,6 +149,6 @@ Roles disponibles:
 php artisan test
 ```
 
-## 📝 Créditos
+## 📝 Repo Original
 
 Para ver el repo original irse a [Repo](https://github.com/Ivanrr462/API-TechUniverse)

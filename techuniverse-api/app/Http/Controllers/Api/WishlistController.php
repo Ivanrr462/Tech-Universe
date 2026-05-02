@@ -51,7 +51,7 @@ class WishlistController extends Controller
      */
     public function index()
     {
-        $users = User::with('deseos')->get();
+        $users = User::has('deseos')->with('deseos')->get();
 
         return WishlistResource::collection($users);
     }

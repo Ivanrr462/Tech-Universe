@@ -22,6 +22,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::apiResource('/productos', ProductoController::class, ['as' => 'api'])->only(['index', 'show']);
+Route::get('productos/count', [ProductoController::class, 'count']);
 Route::get('/categoria/productos', [CategoriaController::class, 'indexProductos'])->name('api.categoria.productos');
 Route::apiResource('/categoria', CategoriaController::class, ['as' => 'api'])->only(['index', 'show']);
 Route::get('/especificacion/productos', [EspecifiacionController::class, 'indexProductos'])->name('api.especificacion.productos');

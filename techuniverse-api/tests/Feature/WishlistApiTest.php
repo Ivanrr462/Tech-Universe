@@ -14,12 +14,13 @@ class WishlistApiTest extends TestCase
 
     public function test_puede_listar_wishlists()
     {
-        $users = User::factory()
+        User::factory()
             ->count(2)
             ->has(Producto::factory()->count(2), 'deseos')
             ->create();
 
-        Sanctum::actingAs($users->first(), ['*']);
+        $admin = User::factory()->create(['rol' => 'admin']);
+        Sanctum::actingAs($admin, ['*']);
 
         $response = $this->getJson('/api/deseos');
 
