@@ -18,7 +18,6 @@ TechUniverse es un e-commerce tecnológico. Este trabajo constituye el Trabajo d
 
 ## Demostración
 
-Se debe descargar el vídeo para poder visualizarlo:
 [Demostración TechUniverse](https://drive.google.com/file/d/1ALMScHhkEyg9Yz9KpZ_TAwLdgAdaIH_u/view?usp=sharing)
 
 ## Miembros
