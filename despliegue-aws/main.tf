@@ -46,10 +46,10 @@ resource "aws_security_group" "BackEnd" {
   }
 }
 
-resource "aws_security_group" "BBDD" {
+resource "aws_security_group" "db" {
   description = "Allow Database Traffic"
   tags = {
-    Name = "BBDD"
+    Name = "db"
   }
 }
 
@@ -87,8 +87,8 @@ resource "aws_vpc_security_group_ingress_rule" "ssh_BackEnd" {
 }
 
 // El salto ssh a la base de datos solo puede hacerse desde el backend pq me da la gana que sea asi :)
-resource "aws_vpc_security_group_ingress_rule" "ssh_BBDD" {
-  security_group_id            = aws_security_group.BBDD.id
+resource "aws_vpc_security_group_ingress_rule" "ssh_db" {
+  security_group_id            = aws_security_group.db.id
   from_port                    = 22
   to_port                      = 22
   ip_protocol                  = "TCP"
@@ -112,9 +112,9 @@ resource "aws_vpc_security_group_ingress_rule" "http_BackEnd" {
   referenced_security_group_id = aws_security_group.FrontEnd.id
 }
 
-// BBDD
-resource "aws_vpc_security_group_ingress_rule" "mysql_BBDD" {
-  security_group_id            = aws_security_group.BBDD.id
+// db
+resource "aws_vpc_security_group_ingress_rule" "mysql_db" {
+  security_group_id            = aws_security_group.db.id
   from_port                    = 3306
   to_port                      = 3306
   ip_protocol                  = "TCP"
@@ -150,27 +150,27 @@ resource "aws_instance" "BackEnd" {
   key_name = var.key_name
   vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.BackEnd.id ]
   user_data = templatefile("userdata/backend.tftpl", {
-    DB_HOST          = aws_instance.BBDD.private_ip
+    DB_HOST          = aws_instance.db.private_ip
     DB_ROOT_PASSWORD = var.db_root_password
   })
   user_data_replace_on_change = true
-  depends_on = [aws_instance.BBDD]
+  depends_on = [aws_instance.db]
   tags = {
     Name = "BackEnd"
   }
 }
 
-resource "aws_instance" "BBDD" {
+resource "aws_instance" "db" {
   ami = data.aws_ami.ubuntu.id
   instance_type = var.Instance_Type
   key_name = var.key_name
-  vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.BBDD.id ]
-  user_data = templatefile("userdata/bbdd.tftpl", {
+  vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.db.id ]
+  user_data = templatefile("userdata/db.tftpl", {
     DB_ROOT_PASSWORD = var.db_root_password
   })
   user_data_replace_on_change = true
   tags = {
-    Name = "BBDD"
+    Name = "db"
   }
 }
 
