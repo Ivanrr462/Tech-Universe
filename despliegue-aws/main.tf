@@ -5,9 +5,13 @@ terraform {
       version = "~> 6.18.0"
     }
   }
-}
 
-// Falta el s3
+  backend "s3" {
+    bucket  = "techuniverse-terraform-state"
+    key     = "terraform.tfstate"
+    region  = "us-east-1"
+  }
+}
 
 provider "aws" {
   region = var.region
@@ -145,7 +149,7 @@ resource "aws_instance" "BackEnd" {
   instance_type = var.Instance_Type
   key_name = var.key_name
   vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.BackEnd.id ]
-  user_data = templatefile("backend.tftpl", {
+  user_data = templatefile("userdata/backend.tftpl", {
     DB_HOST          = aws_instance.BBDD.private_ip
     DB_ROOT_PASSWORD = var.db_root_password
   })
@@ -161,7 +165,7 @@ resource "aws_instance" "BBDD" {
   instance_type = var.Instance_Type
   key_name = var.key_name
   vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.BBDD.id ]
-  user_data = templatefile("bbdd.tftpl", {
+  user_data = templatefile("userdata/bbdd.tftpl", {
     DB_ROOT_PASSWORD = var.db_root_password
   })
   user_data_replace_on_change = true
@@ -171,14 +175,14 @@ resource "aws_instance" "BBDD" {
 }
 
 // IP Elástica
-resource "aws_eip" "ipelastica" {
+//resource "aws_eip" "ipelastica" {
   // Por ahora lo asocio a la instancia del backend ya que es mejor tenerla con una ip fija
-  instance = aws_instance.BackEnd.id
-  domain = "vpc"
-  tags = {
-    Name = "ip elastica"
-  }
-}
+//  instance = aws_instance.BackEnd.id
+//  domain = "vpc"
+//  tags = {
+//    Name = "ip elastica"
+//  }
+//}
 
 // Ruta 53
 resource "aws_route53_zone" "default" {

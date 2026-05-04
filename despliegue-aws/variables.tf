@@ -1,6 +1,5 @@
 variable "key_name" {
   type    = string
-  default = "vockey"
 }
 
 variable "region" {
@@ -27,6 +26,10 @@ data "aws_ami" "ubuntu" {
   }
 
   owners = ["099720109477"] # Canonical
+}
+
+data "aws_vpc" "default_vpc" {
+  default = true
 }
 
 variable "Instance_Type" {
