@@ -1,5 +1,5 @@
 variable "key_name" {
-  type    = string
+  type = string
 }
 
 variable "region" {
@@ -32,12 +32,17 @@ data "aws_vpc" "default_vpc" {
   default = true
 }
 
+variable "Instance_Profile" {
+  type    = string
+  default = "LabInstanceProfile"
+}
+
 variable "Instance_Type" {
-    type = string
-    default = "t2.medium"
+  type    = string
+  default = "t2.medium"
 }
 
 variable "db_root_password" {
-  type        = string
-  sensitive   = true
+  type      = string
+  sensitive = true
 }

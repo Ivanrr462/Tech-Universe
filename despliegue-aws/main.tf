@@ -7,9 +7,9 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "techuniverse-terraform-state"
-    key     = "terraform.tfstate"
-    region  = "us-east-1"
+    bucket = "techuniverse-terraform-state"
+    key    = "terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
@@ -105,10 +105,10 @@ resource "aws_vpc_security_group_ingress_rule" "http" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "http_BackEnd" {
-  security_group_id = aws_security_group.BackEnd.id
-  from_port         = 80
-  to_port           = 80
-  ip_protocol       = "TCP"
+  security_group_id            = aws_security_group.BackEnd.id
+  from_port                    = 80
+  to_port                      = 80
+  ip_protocol                  = "TCP"
   referenced_security_group_id = aws_security_group.FrontEnd.id
 }
 
@@ -123,48 +123,50 @@ resource "aws_vpc_security_group_ingress_rule" "mysql_db" {
 
 // Instancias
 resource "aws_instance" "Bastion" {
-  ami = data.aws_ami.ubuntu.id
-  instance_type = var.Instance_Type
-  key_name = var.key_name
-  vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.Bastion.id ]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.Instance_Type
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.all.id, aws_security_group.Bastion.id]
   tags = {
     Name = "Bastion"
   }
 }
 
 resource "aws_instance" "FrontEnd" {
-  ami = data.aws_ami.ubuntu.id
-  instance_type = var.Instance_Type
-  key_name = var.key_name
-  vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.FrontEnd.id ]
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = var.Instance_Type
+  iam_instance_profile        = var.Instance_Profile
+  key_name                    = var.key_name
+  vpc_security_group_ids      = [aws_security_group.all.id, aws_security_group.FrontEnd.id]
   user_data_replace_on_change = true
-  depends_on = [aws_instance.BackEnd]
+  depends_on                  = [aws_instance.BackEnd]
   tags = {
     Name = "FrontEnd"
   }
 }
 
 resource "aws_instance" "BackEnd" {
-  ami = data.aws_ami.ubuntu.id
-  instance_type = var.Instance_Type
-  key_name = var.key_name
-  vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.BackEnd.id ]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.Instance_Type
+  iam_instance_profile   = var.Instance_Profile
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.all.id, aws_security_group.BackEnd.id]
   user_data = templatefile("userdata/backend.tftpl", {
     DB_HOST          = aws_instance.db.private_ip
     DB_ROOT_PASSWORD = var.db_root_password
   })
   user_data_replace_on_change = true
-  depends_on = [aws_instance.db]
+  depends_on                  = [aws_instance.db]
   tags = {
     Name = "BackEnd"
   }
 }
 
 resource "aws_instance" "db" {
-  ami = data.aws_ami.ubuntu.id
-  instance_type = var.Instance_Type
-  key_name = var.key_name
-  vpc_security_group_ids = [ aws_security_group.all.id, aws_security_group.db.id ]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.Instance_Type
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.all.id, aws_security_group.db.id]
   user_data = templatefile("userdata/db.tftpl", {
     DB_ROOT_PASSWORD = var.db_root_password
   })
@@ -176,7 +178,7 @@ resource "aws_instance" "db" {
 
 // IP Elástica
 //resource "aws_eip" "ipelastica" {
-  // Por ahora lo asocio a la instancia del backend ya que es mejor tenerla con una ip fija
+// Por ahora lo asocio a la instancia del backend ya que es mejor tenerla con una ip fija
 //  instance = aws_instance.BackEnd.id
 //  domain = "vpc"
 //  tags = {
@@ -188,34 +190,34 @@ resource "aws_instance" "db" {
 resource "aws_route53_zone" "default" {
   name = var.domain
   vpc {
-    vpc_id = data.aws_vpc.default_vpc.id
+    vpc_id     = data.aws_vpc.default_vpc.id
     vpc_region = var.region
   }
 }
 
 // Record del Bastion
 resource "aws_route53_record" "bastion_record" {
-  type = "A"
-  name = "bastion.${var.domain}"
+  type    = "A"
+  name    = "bastion.${var.domain}"
   zone_id = aws_route53_zone.default.zone_id
-  ttl = 3600
-  records = [ aws_instance.Bastion.private_ip ] 
+  ttl     = 3600
+  records = [aws_instance.Bastion.private_ip]
 }
 
 // Record del FrontEnd
 resource "aws_route53_record" "frontend_record" {
-  type = "A"
-  name = "frontend.${var.domain}"
+  type    = "A"
+  name    = "frontend.${var.domain}"
   zone_id = aws_route53_zone.default.zone_id
-  ttl = 3600
-  records = [ aws_instance.FrontEnd.private_ip ] 
+  ttl     = 3600
+  records = [aws_instance.FrontEnd.private_ip]
 }
 
 // Record del BackEnd
 resource "aws_route53_record" "backend_record" {
-  type = "A"
-  name = "backend.${var.domain}"
+  type    = "A"
+  name    = "backend.${var.domain}"
   zone_id = aws_route53_zone.default.zone_id
-  ttl = 3600
-  records = [ aws_instance.BackEnd.public_ip ] 
+  ttl     = 3600
+  records = [aws_instance.BackEnd.public_ip]
 }
