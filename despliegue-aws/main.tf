@@ -138,6 +138,9 @@ resource "aws_instance" "FrontEnd" {
   iam_instance_profile        = var.Instance_Profile
   key_name                    = var.key_name
   vpc_security_group_ids      = [aws_security_group.all.id, aws_security_group.FrontEnd.id]
+  user_data = templatefile("userdata/frontend.tftpl", {
+    BACKEND_HOST = aws_instance.BackEnd.private_ip
+  })
   user_data_replace_on_change = true
   depends_on                  = [aws_instance.BackEnd]
   tags = {
