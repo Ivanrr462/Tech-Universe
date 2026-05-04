@@ -59,3 +59,11 @@ DB_DATABASE=techuniverse
 DB_USERNAME=root
 DB_PASSWORD=${DB_ROOT_PASSWORD}
 EOF
+
+# CodeDeploy Agent
+apt-get install -y ruby-full wget
+wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+chmod +x ./install
+./install auto
+systemctl enable codedeploy-agent
+systemctl start codedeploy-agent
