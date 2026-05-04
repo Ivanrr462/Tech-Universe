@@ -6,7 +6,16 @@
     "outDir": "./out-tsc/spec",
     "types": [
       "vitest/globals"
-    ]
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"],
+      "@app/*": ["src/app/*"],
+      "@components/*": ["src/app/components/*"],
+      "@services/*": ["src/app/services/*"],
+      "@models/*": ["src/app/models/*"],
+      "@data/*": ["src/app/data/*"]
+    }
   },
   "include": [
     "src/**/*.d.ts",
