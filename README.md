@@ -16,6 +16,11 @@
 
 TechUniverse es un e-commerce tecnológico. Este trabajo constituye el Trabajo de Fin de Grado (TFG) del grado superior de Desarrollo de Aplicaciones Web. El objetivo de nuestro proyecto es crear un e-commerce que incluya la parte pública, el panel del administrador, una API que sirva datos al e-commerce y un despliegue en AWS.
 
+## Demostración
+
+Se debe descargar el vídeo para poder visualizarlo:
+[Demostración TechUniverse](https://drive.google.com/file/d/1ALMScHhkEyg9Yz9KpZ_TAwLdgAdaIH_u/view?usp=sharing)
+
 ## Miembros
 
 - Iván Ríos Raya
