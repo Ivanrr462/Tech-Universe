@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ToastService } from './toast.service';
 
 describe('ToastService', () => {
@@ -61,10 +61,12 @@ describe('ToastService', () => {
     expect(service.toasts().length).toBe(3);
   });
 
-  it('should auto-remove toast after 3 seconds', fakeAsync(() => {
+  it('should auto-remove toast after 3 seconds', () => {
+    vi.useFakeTimers();
     service.success('Temporal');
     expect(service.toasts().length).toBe(1);
-    tick(3000);
+    vi.advanceTimersByTime(3000);
     expect(service.toasts().length).toBe(0);
-  }));
+    vi.useRealTimers();
+  });
 });
