@@ -2,21 +2,21 @@
 apt-get update -y
 apt-get install -y software-properties-common curl git unzip ruby-full wget
 
-# PHP 8.1 (repositorio oficial de Ubuntu)
-apt-get install -y php8.1 php8.1-cli php8.1-mysql php8.1-xml \
-  php8.1-mbstring php8.1-curl php8.1-zip php8.1-bcmath php8.1-intl \
-  libapache2-mod-php8.1
+# PHP 8.3 (incluido en Ubuntu 24.04)
+apt-get install -y php8.3 php8.3-cli php8.3-mysql php8.3-xml \
+  php8.3-mbstring php8.3-curl php8.3-zip php8.3-bcmath php8.3-intl \
+  libapache2-mod-php8.3
 
 # Composer
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-ln -s /usr/local/bin/composer /usr/bin/composer
+ln -sf /usr/local/bin/composer /usr/bin/composer
 
 # Apache
 apt-get install -y apache2
 
 # Habilitar módulos necesarios para Laravel
 a2enmod rewrite
-a2enmod php8.1
+a2enmod php8.3
 
 # VirtualHost de Apache para Laravel
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
