@@ -1,4 +1,4 @@
-name: CodeDeploy Backend
+name: Despliegue del código
 
 on:
   push:
