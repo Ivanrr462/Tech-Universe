@@ -86,7 +86,8 @@ class ProductoResource extends Resource
                     ->required()
                     ->visibility('public')
                     ->maxSize(4096)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->storeFiles(false),
             ]);
     }
 
@@ -95,9 +96,13 @@ class ProductoResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('foto')
-                    ->disk('r2')
                     ->label('Foto')
-                    ->square(),
+                    ->square()
+                    ->getStateUsing(
+                        fn (Producto $record): string => $record->foto
+                            ?? 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/dvEcf0VxtjxaHq3yAHBw9uQr4CW4keFw3GFAUvqa.jpg'
+                    )
+                    ->disk(null),
 
                 TextColumn::make('nombre')
                     ->label('Nombre')

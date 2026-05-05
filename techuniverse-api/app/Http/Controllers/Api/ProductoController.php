@@ -49,7 +49,7 @@ class ProductoController extends Controller
      * @OA\Get(
      *     path="/api/productos",
      *     summary="Listar productos con paginación",
-     *     description="Retorna una lista paginada de productos, incluyendo su categoría y especificaciones.",
+     *     description="Retorna una lista paginada de productos, incluyendo su categoría y especificaciones. Permite ordenación opcional por precio o novedad.",
      *     tags={"Productos"},
      *
      *     @OA\Parameter(
@@ -60,6 +60,18 @@ class ProductoController extends Controller
      *         example=1,
      *
      *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="sort",
+     *         in="query",
+     *         description="Criterio de ordenación opcional",
+     *         required=false,
+     *
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"precio_asc", "precio_desc", "novedad_asc", "novedad_desc"}
+     *         )
      *     ),
      *
      *     @OA\Response(
@@ -88,11 +100,96 @@ class ProductoController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        $productos = Producto::with('categoria', 'productoEspecificaciones.especificacion')->paginate(12);
+        $query = Producto::with('categoria', 'productoEspecificaciones.especificacion');
 
-        return ProductoResource::collection($productos);
+        $sortMap = [
+            'precio_asc' => ['precio', 'asc'],
+            'precio_desc' => ['precio', 'desc'],
+            'novedad_asc' => ['created_at', 'asc'],
+            'novedad_desc' => ['created_at', 'desc'],
+        ];
+
+        $sort = $request->query('sort');
+
+        if ($sort && array_key_exists($sort, $sortMap)) {
+            [$column, $direction] = $sortMap[$sort];
+            $query->orderBy($column, $direction);
+        }
+
+        return ProductoResource::collection($query->paginate(12));
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/productos/{id}",
+     *     summary="Obtener un producto por ID",
+     *     description="Retorna un producto específico con su categoría y especificaciones",
+     *     tags={"Productos"},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID del producto",
+     *
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Producto encontrado",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/Producto")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="No encontrado")
+     *         )
+     *     )
+     * )
+     */
+    public function show(string $id)
+    {
+        $producto = Producto::with('categoria', 'productoEspecificaciones.especificacion')->find($id);
+
+        if (! $producto) {
+            return response()->json(['error' => 'No encontrado'], 404);
+        }
+
+        return new ProductoResource($producto);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/productos/count",
+     *     summary="Contar total de productos",
+     *     description="Retorna el número total de productos en la base de datos.",
+     *     tags={"Productos"},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Total de productos obtenido correctamente",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="total", type="integer", example=60)
+     *         )
+     *     )
+     * )
+     */
+    public function count()
+    {
+        return response()->json([
+            'total' => Producto::count(),
+        ]);
     }
 
     /**
@@ -167,51 +264,6 @@ class ProductoController extends Controller
             'mensaje' => 'Producto creado con éxito',
             'data' => new ProductoResource($producto->load('categoria', 'productoEspecificaciones.especificacion')),
         ], 201);
-    }
-
-    /**
-     * @OA\Get(
-     *     path="/api/productos/{id}",
-     *     summary="Obtener un producto por ID",
-     *     description="Retorna un producto específico con su categoría y especificaciones",
-     *     tags={"Productos"},
-     *
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="ID del producto",
-     *
-     *         @OA\Schema(type="integer", example=1)
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=200,
-     *         description="Producto encontrado",
-     *
-     *         @OA\JsonContent(ref="#/components/schemas/Producto")
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=404,
-     *         description="Producto no encontrado",
-     *
-     *         @OA\JsonContent(
-     *
-     *             @OA\Property(property="error", type="string", example="No encontrado")
-     *         )
-     *     )
-     * )
-     */
-    public function show(string $id)
-    {
-        $producto = Producto::with('categoria', 'productoEspecificaciones.especificacion')->find($id);
-
-        if (! $producto) {
-            return response()->json(['error' => 'No encontrado'], 404);
-        }
-
-        return new ProductoResource($producto);
     }
 
     /**

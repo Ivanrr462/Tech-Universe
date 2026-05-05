@@ -180,11 +180,15 @@ class CategoriaController extends Controller
      */
     public function show(string $id)
     {
-        $categoria = Categoria::with('productos')->find($id);
+        $categoria = Categoria::find($id);
 
         if (! $categoria) {
             return response()->json(['error' => 'No encontrado'], 404);
         }
+
+        $productos = $categoria->productos()->paginate(12);
+
+        $categoria->productos = $productos;
 
         return new CategoriaConProductosResource($categoria);
     }

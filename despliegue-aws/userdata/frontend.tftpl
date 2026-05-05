@@ -1,0 +1,47 @@
+#!/bin/bash
+apt-get update -y
+apt-get install -y apache2 curl unzip ruby-full wget
+
+# Habilitar módulos necesarios
+a2enmod proxy
+a2enmod proxy_http
+a2enmod rewrite
+
+# VirtualHost de Apache para el FrontEnd
+cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
+<VirtualHost *:80>
+    ServerName frontend.techuniverse.com
+    DocumentRoot /var/www/frontend
+
+    <Directory /var/www/frontend>
+        AllowOverride All
+        Require all granted
+        Options -Indexes +FollowSymLinks
+        FallbackResource /index.html
+    </Directory>
+
+    # Proxy /api al BackEnd
+    ProxyPass /api/ http://${BACKEND_HOST}/api/
+    ProxyPassReverse /api/ http://${BACKEND_HOST}/api/
+
+    ErrorLog $${APACHE_LOG_DIR}/techuniverse-frontend-error.log
+    CustomLog $${APACHE_LOG_DIR}/techuniverse-frontend-access.log combined
+</VirtualHost>
+EOF
+
+# Activar el sitio y desactivar el default
+a2ensite techuniverse.conf
+a2dissite 000-default.conf
+
+mkdir -p /var/www/frontend
+chown -R www-data:www-data /var/www/frontend
+
+systemctl enable apache2
+systemctl restart apache2
+
+# CodeDeploy Agent
+wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+chmod +x ./install
+./install auto
+systemctl enable codedeploy-agent
+systemctl start codedeploy-agent

@@ -1,0 +1,45 @@
+name: Terraform AWS Deploy
+
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'despliegue-aws/**'
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    name: 🏗️ Terraform Apply
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: despliegue-aws
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+      AWS_DEFAULT_REGION: us-east-1
+      TF_VAR_db_root_password: ${{ secrets.DB_ROOT_PASSWORD }}
+      TF_VAR_key_name: ${{ secrets.AWS_KEY_NAME }}
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+
+      - name: 🔍 Terraform Init
+        run: terraform init
+
+      - name: ✅ Terraform Validate
+        run: terraform validate
+
+      - name: 📋 Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: 🚀 Terraform Apply
+        run: terraform apply -auto-approve tfplan

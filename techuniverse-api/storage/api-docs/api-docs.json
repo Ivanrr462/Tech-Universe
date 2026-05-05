@@ -1224,7 +1224,7 @@
                     "Productos"
                 ],
                 "summary": "Listar productos con paginación",
-                "description": "Retorna una lista paginada de productos, incluyendo su categoría y especificaciones.",
+                "description": "Retorna una lista paginada de productos, incluyendo su categoría y especificaciones. Permite ordenación opcional por precio o novedad.",
                 "operationId": "70a301af8ea04ce2f2596a58758632cd",
                 "parameters": [
                     {
@@ -1236,6 +1236,21 @@
                             "type": "integer"
                         },
                         "example": 1
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Criterio de ordenación opcional",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "precio_asc",
+                                "precio_desc",
+                                "novedad_asc",
+                                "novedad_desc"
+                            ]
+                        }
                     }
                 ],
                 "responses": {
@@ -1596,6 +1611,34 @@
                                         "error": {
                                             "type": "string",
                                             "example": "No encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/productos/count": {
+            "get": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Contar total de productos",
+                "description": "Retorna el número total de productos en la base de datos.",
+                "operationId": "2cbe28698f97fc94a573d6c725ba7166",
+                "responses": {
+                    "200": {
+                        "description": "Total de productos obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 60
                                         }
                                     },
                                     "type": "object"
