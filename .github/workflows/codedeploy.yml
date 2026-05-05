@@ -4,12 +4,10 @@ on:
   push:
     # Borrar rama develop cuando este probado y funcionando
     branches: [main, develop]
-    #paths:
-    #  - "techuniverse-api/**"
-    #  - "Angular-frontend/**"
-    #  - "React-components/**"
-      # Esta linea es solo para pruebas
-    #  - "despliegue-aws/**"
+    paths:
+      - "techuniverse-api/**"
+      - "Angular-frontend/**"
+      - "React-components/**"
   workflow_dispatch:
 
 jobs:
