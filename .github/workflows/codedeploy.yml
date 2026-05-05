@@ -2,8 +2,7 @@ name: Despliegue del código
 
 on:
   push:
-    # Borrar rama develop cuando este probado y funcionando
-    branches: [main, develop]
+    branches: [ main ]
     paths:
       - "techuniverse-api/**"
       - "Angular-frontend/**"
