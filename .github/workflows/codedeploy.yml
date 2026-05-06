@@ -7,6 +7,7 @@ on:
       - "techuniverse-api/**"
       - "Angular-frontend/**"
       - "React-components/**"
+      - 'despliegue-aws/**'
   workflow_dispatch:
 
 jobs:

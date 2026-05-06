@@ -1,21 +1,20 @@
 #!/bin/bash
-set -e
 exec > /var/log/userdata.log 2>&1
 
 apt-get update -y
 apt-get install -y software-properties-common curl git unzip ruby-full wget
 
-# PHP 8.3 (incluido en Ubuntu 24.04)
-apt-get install -y php8.3 php8.3-cli php8.3-mysql php8.3-xml \
-  php8.3-mbstring php8.3-curl php8.3-zip php8.3-bcmath php8.3-intl \
-  libapache2-mod-php8.3
+# PHP (última versión disponible en Ubuntu 24.04)
+apt-get install -y php php-cli php-mysql php-xml \
+  php-mbstring php-curl php-zip php-bcmath php-intl \
+  libapache2-mod-php
+
+# Habilitar módulos de Apache
+a2enmod rewrite
+a2enmod php$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
 
 # Apache
 apt-get install -y apache2
-
-# Habilitar módulos necesarios para Laravel
-a2enmod rewrite
-a2enmod php8.3
 
 # Composer
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -33,8 +32,8 @@ cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
         Options -Indexes +FollowSymLinks
     </Directory>
 
-    ErrorLog $${APACHE_LOG_DIR}/techuniverse-error.log
-    CustomLog $${APACHE_LOG_DIR}/techuniverse-access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/techuniverse-error.log
+    CustomLog ${APACHE_LOG_DIR}/techuniverse-access.log combined
 </VirtualHost>
 EOF
 
@@ -47,11 +46,6 @@ chown -R www-data:www-data /var/www/api
 
 systemctl enable apache2
 systemctl restart apache2
-
-# Certbot
-snap install core && snap refresh core
-snap install --classic certbot
-ln -sf /snap/bin/certbot /usr/bin/certbot
 
 # .env base para cuando llegue el pipeline de CD
 cat > /var/www/.env.base << EOF
