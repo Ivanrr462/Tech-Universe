@@ -10,8 +10,9 @@ a2enmod proxy_http
 a2enmod rewrite
 a2enmod ssl
 
-# Actualizar IP en DuckDNS
-PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+# Actualizar IP en DuckDNS usando IMDSv2
+TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
 curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
 
 # Esperar propagación DNS
@@ -21,6 +22,24 @@ sleep 30
 snap install core && snap refresh core
 snap install --classic certbot
 ln -sf /snap/bin/certbot /usr/bin/certbot
+
+# VirtualHost HTTP temporal para que Certbot pueda verificar
+cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
+<VirtualHost *:80>
+    ServerName techuniverse.duckdns.org
+    DocumentRoot /var/www/frontend
+
+    <Directory /var/www/frontend>
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+EOF
+
+a2ensite techuniverse.conf
+a2dissite 000-default.conf
+mkdir -p /var/www/frontend
+systemctl restart apache2
 
 # Generar certificado
 certbot --apache -d techuniverse.duckdns.org --non-interactive --agree-tos -m ivan.rios1712@gmail.com
@@ -61,20 +80,16 @@ cat > /etc/apache2/sites-available/techuniverse-ssl.conf << EOF
 </VirtualHost>
 EOF
 
-# Activar sitios
 a2ensite techuniverse.conf
 a2ensite techuniverse-ssl.conf
-a2dissite 000-default.conf
-
-mkdir -p /var/www/frontend
 chown -R www-data:www-data /var/www/frontend
 
 systemctl enable apache2
 systemctl restart apache2
 
 # Cron para actualizar DuckDNS en cada reinicio
-cat > /etc/cron.d/duckdns << CRON
-@reboot root PUBLIC_IP=\$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4) && curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=\$PUBLIC_IP"
+cat > /etc/cron.d/duckdns << 'CRON'
+@reboot root TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4) && curl -s "https://www.duckdns.org/update?domains=techuniverse&token=DUCKDNS_TOKEN_PLACEHOLDER&ip=$PUBLIC_IP"
 CRON
 
 # CodeDeploy Agent
