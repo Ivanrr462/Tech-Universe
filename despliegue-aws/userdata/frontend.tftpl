@@ -1,17 +1,53 @@
 #!/bin/bash
+exec > /var/log/userdata.log 2>&1
+
 apt-get update -y
-apt-get install -y apache2 curl unzip ruby-full wget
+apt-get install -y apache2 curl unzip ruby-full wget snapd
 
 # Habilitar módulos necesarios
 a2enmod proxy
 a2enmod proxy_http
 a2enmod rewrite
+a2enmod ssl
 
-# VirtualHost de Apache para el FrontEnd
+# Actualizar IP en DuckDNS
+PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
+
+# Esperar propagación DNS
+sleep 30
+
+# Certbot
+snap install core && snap refresh core
+snap install --classic certbot
+ln -sf /snap/bin/certbot /usr/bin/certbot
+
+# Generar certificado
+certbot --apache -d techuniverse.duckdns.org --non-interactive --agree-tos -m ivan.rios1712@gmail.com
+
+# VirtualHost HTTP → redirige a HTTPS
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
-    ServerName frontend.techuniverse.com
+    ServerName techuniverse.duckdns.org
+    Redirect permanent / https://techuniverse.duckdns.org/
+</VirtualHost>
+EOF
+
+# VirtualHost HTTPS
+cat > /etc/apache2/sites-available/techuniverse-ssl.conf << EOF
+<VirtualHost *:443>
+    ServerName techuniverse.duckdns.org
     DocumentRoot /var/www/frontend
+
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/techuniverse.duckdns.org/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse.duckdns.org/privkey.pem
+
+    ProxyPass /api/ http://${BACKEND_HOST}/api/
+    ProxyPassReverse /api/ http://${BACKEND_HOST}/api/
+
+    ProxyPass /admin/ http://${BACKEND_HOST}/admin/
+    ProxyPassReverse /admin/ http://${BACKEND_HOST}/admin/
 
     <Directory /var/www/frontend>
         AllowOverride All
@@ -20,17 +56,14 @@ cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
         FallbackResource /index.html
     </Directory>
 
-    # Proxy /api al BackEnd
-    ProxyPass /api/ http://${BACKEND_HOST}/api/
-    ProxyPassReverse /api/ http://${BACKEND_HOST}/api/
-
-    ErrorLog $${APACHE_LOG_DIR}/techuniverse-frontend-error.log
-    CustomLog $${APACHE_LOG_DIR}/techuniverse-frontend-access.log combined
+    ErrorLog /var/log/apache2/techuniverse-ssl-error.log
+    CustomLog /var/log/apache2/techuniverse-ssl-access.log combined
 </VirtualHost>
 EOF
 
-# Activar el sitio y desactivar el default
+# Activar sitios
 a2ensite techuniverse.conf
+a2ensite techuniverse-ssl.conf
 a2dissite 000-default.conf
 
 mkdir -p /var/www/frontend
@@ -38,6 +71,11 @@ chown -R www-data:www-data /var/www/frontend
 
 systemctl enable apache2
 systemctl restart apache2
+
+# Cron para actualizar DuckDNS en cada reinicio
+cat > /etc/cron.d/duckdns << CRON
+@reboot root PUBLIC_IP=\$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4) && curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=\$PUBLIC_IP"
+CRON
 
 # CodeDeploy Agent
 wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install

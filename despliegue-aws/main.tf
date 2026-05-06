@@ -112,6 +112,15 @@ resource "aws_vpc_security_group_ingress_rule" "http_BackEnd" {
   referenced_security_group_id = aws_security_group.FrontEnd.id
 }
 
+// HTTPS
+resource "aws_vpc_security_group_ingress_rule" "https_frontend" {
+  security_group_id = aws_security_group.FrontEnd.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "TCP"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 // db
 resource "aws_vpc_security_group_ingress_rule" "mysql_db" {
   security_group_id            = aws_security_group.db.id
@@ -140,6 +149,7 @@ resource "aws_instance" "FrontEnd" {
   vpc_security_group_ids      = [aws_security_group.all.id, aws_security_group.FrontEnd.id]
   user_data = templatefile("userdata/frontend.tftpl", {
     BACKEND_HOST = aws_instance.BackEnd.private_ip
+    DUCKDNS_TOKEN = var.duckdns_token
   })
   user_data_replace_on_change = true
   depends_on                  = [aws_instance.BackEnd]

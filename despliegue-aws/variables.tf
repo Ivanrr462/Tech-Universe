@@ -22,6 +22,11 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+variable "duckdns_token" {
+  type        = string
+  sensitive   = true
+}
+
 data "aws_vpc" "default_vpc" {
   default = true
 }
