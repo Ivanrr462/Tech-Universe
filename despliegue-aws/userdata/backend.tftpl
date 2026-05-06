@@ -32,8 +32,8 @@ cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
         Options -Indexes +FollowSymLinks
     </Directory>
 
-    ErrorLog ${APACHE_LOG_DIR}/techuniverse-error.log
-    CustomLog ${APACHE_LOG_DIR}/techuniverse-access.log combined
+    ErrorLog /var/log/apache2/techuniverse-error.log
+    CustomLog /var/log/apache2/techuniverse-access.log combined
 </VirtualHost>
 EOF
 
