@@ -2,7 +2,7 @@ name: Terraform AWS Deploy
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ main ]
     paths:
       - 'despliegue-aws/**'
   workflow_dispatch:

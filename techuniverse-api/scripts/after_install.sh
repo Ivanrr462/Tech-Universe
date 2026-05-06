@@ -1,5 +1,5 @@
 #!/bin/bash
-#pruebas
+#blablabla
 chown -R ubuntu:ubuntu /var/www/api
 cd /var/www/api
 composer install --no-dev --optimize-autoloader
