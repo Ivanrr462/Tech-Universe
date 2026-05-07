@@ -189,7 +189,7 @@ resource "aws_instance" "db" {
   }
 }
 
-// IP Elástica
+// IP Elásticaa
 //resource "aws_eip" "ipelastica" {
 //  instance = aws_instance.Bastion.id
 //  domain = "vpc"
