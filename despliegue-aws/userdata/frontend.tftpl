@@ -49,7 +49,7 @@ cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
     ServerName techuniverse.duckdns.org
     RewriteEngine on
-    RewriteCond %{SERVER_NAME} =techuniverse.duckdns.org
+    RewriteCond %%{SERVER_NAME} =techuniverse.duckdns.org
     RewriteRule ^ https://%%{SERVER_NAME}%%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
 EOF
