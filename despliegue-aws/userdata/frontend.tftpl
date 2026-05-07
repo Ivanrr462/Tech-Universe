@@ -64,12 +64,14 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     Include /etc/letsencrypt/options-ssl-apache.conf
     SSLCertificateFile /etc/letsencrypt/live/techuniverse.duckdns.org/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse.duckdns.org/privkey.pem
+    
+    ProxyPreserveHost On
 
     ProxyPass /api/ http://${BACKEND_HOST}/api/
     ProxyPassReverse /api/ http://${BACKEND_HOST}/api/
 
-    ProxyPass /admin/ http://${BACKEND_HOST}/admin/
-    ProxyPassReverse /admin/ http://${BACKEND_HOST}/admin/
+    ProxyPass /admin http://${BACKEND_HOST}/admin
+    ProxyPassReverse /admin http://${BACKEND_HOST}/admin
 
     <Directory /var/www/frontend>
         AllowOverride All
