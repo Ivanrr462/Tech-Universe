@@ -191,8 +191,7 @@ resource "aws_instance" "db" {
 
 // IP Elástica
 //resource "aws_eip" "ipelastica" {
-// Por ahora lo asocio a la instancia del backend ya que es mejor tenerla con una ip fija
-//  instance = aws_instance.BackEnd.id
+//  instance = aws_instance.Bastion.id
 //  domain = "vpc"
 //  tags = {
 //    Name = "ip elastica"
