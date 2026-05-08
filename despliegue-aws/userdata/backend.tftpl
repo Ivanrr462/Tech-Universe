@@ -16,10 +16,7 @@ a2enmod php$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
 # Apache
 apt-get install -y apache2
 
-# Composer
 export HOME=/root
-curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-ln -sf /usr/local/bin/composer /usr/bin/composer
 
 # VirtualHost de Apache para Laravel
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'

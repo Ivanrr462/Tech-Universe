@@ -7,6 +7,12 @@ cd /var/www/api
 # DEPENDENCIAS PHP
 # =========================
 export PATH=$PATH:/usr/local/bin:/usr/bin
+
+if ! command -v composer >/dev/null 2>&1; then
+  curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  chmod +x /usr/local/bin/composer
+fi
+
 /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 php artisan key:generate --force
