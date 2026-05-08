@@ -2,7 +2,7 @@
 exec > /var/log/userdata.log 2>&1
 
 # =========================
-# DEPENDENCIAS BASE
+# DEPENDENCIAS
 # =========================
 apt-get update -y
 DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -15,7 +15,7 @@ a2enmod rewrite ssl headers proxy proxy_http
 systemctl enable apache2
 
 # =========================
-# DUCKDNS
+# DUCKDNS (actualización IP al boot)
 # =========================
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
@@ -29,7 +29,13 @@ snap install --classic certbot
 ln -sf /snap/bin/certbot /usr/bin/certbot
 
 # =========================
-# VHOST HTTP (TEMP)
+# WEB ROOT
+# =========================
+mkdir -p /var/www/frontend
+chown -R www-data:www-data /var/www/frontend
+
+# =========================
+# VHOST HTTP (para validación certbot)
 # =========================
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
@@ -46,23 +52,24 @@ EOF
 a2ensite techuniverse.conf
 a2dissite 000-default.conf
 
-mkdir -p /var/www/frontend
 systemctl restart apache2
+
 sleep 10
 
 # =========================
-# CERTBOT
+# CERTBOT (HTTPS)
 # =========================
-if [ ! -d /etc/letsencrypt/live/techuniverse.duckdns.org ]; then
+if [ ! -f /etc/letsencrypt/live/techuniverse.duckdns.org/fullchain.pem ]; then
   certbot --apache \
     -d techuniverse.duckdns.org \
     --non-interactive \
     --agree-tos \
-    -m ivan.rios1712@gmail.com
+    -m ivan.rios1712@gmail.com \
+    --redirect
 fi
 
 # =========================
-# VHOST HTTPS FINAL (SOLO FRONTEND + API)
+# VHOST HTTPS FINAL (CORRECTO)
 # =========================
 cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 <IfModule mod_ssl.c>
@@ -70,13 +77,18 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 
     ServerName techuniverse.duckdns.org
 
+    SSLEngine on
+    Include /etc/letsencrypt/options-ssl-apache.conf
+    SSLCertificateFile /etc/letsencrypt/live/techuniverse.duckdns.org/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse.duckdns.org/privkey.pem
+
     DocumentRoot /var/www/frontend
 
+    ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
 
-    # SOLO API
-    ProxyPreserveHost On
+    # API BACKEND
     ProxyPass /api http://${BACKEND_HOST}/api
     ProxyPassReverse /api http://${BACKEND_HOST}/api
 
@@ -91,18 +103,15 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 </IfModule>
 EOF
 
-systemctl restart apache2
+a2ensite techuniverse-le-ssl.conf
+
+systemctl reload apache2
 
 # =========================
-# PERMISOS
-# =========================
-chown -R www-data:www-data /var/www/frontend
-
-# =========================
-# CODEDEPLOY AGENT (CORRECTO)
+# CODEDEPLOY AGENT
 # =========================
 cd /tmp
-wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+curl -O https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
 chmod +x install
 ./install auto
 
