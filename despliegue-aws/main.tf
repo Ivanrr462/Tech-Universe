@@ -175,6 +175,7 @@ resource "aws_instance" "BackEnd" {
   user_data = templatefile("userdata/backend.tftpl", {
     DB_HOST          = aws_instance.db.private_ip
     DB_ROOT_PASSWORD = var.db_root_password
+    DUCKDNS_TOKEN    = var.duckdns_token
   })
   user_data_replace_on_change = true
   depends_on                  = [aws_instance.db]
