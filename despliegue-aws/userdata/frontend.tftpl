@@ -11,11 +11,11 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y \
 # =========================
 # APACHE MODULES
 # =========================
-a2enmod rewrite ssl headers proxy proxy_http proxy_wstunnel
+a2enmod rewrite ssl headers proxy proxy_http
 systemctl enable apache2
 
 # =========================
-# DUCKDNS (opcional IP dinámica)
+# DUCKDNS
 # =========================
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
@@ -29,7 +29,7 @@ snap install --classic certbot
 ln -sf /snap/bin/certbot /usr/bin/certbot
 
 # =========================
-# VHOST HTTP (temporal)
+# VHOST HTTP (TEMP)
 # =========================
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
@@ -48,22 +48,21 @@ a2dissite 000-default.conf
 
 mkdir -p /var/www/frontend
 systemctl restart apache2
-
 sleep 10
 
 # =========================
-# CERTBOT (solo si no existe)
+# CERTBOT
 # =========================
 if [ ! -d /etc/letsencrypt/live/techuniverse.duckdns.org ]; then
   certbot --apache \
     -d techuniverse.duckdns.org \
     --non-interactive \
     --agree-tos \
-    -m tuemail@gmail.com
+    -m ivan.rios1712@gmail.com
 fi
 
 # =========================
-# VHOST HTTPS FINAL (ANGULAR + PROXY)
+# VHOST HTTPS FINAL (SOLO FRONTEND + API)
 # =========================
 cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 <IfModule mod_ssl.c>
@@ -71,36 +70,15 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 
     ServerName techuniverse.duckdns.org
 
-    Include /etc/letsencrypt/options-ssl-apache.conf
-    SSLCertificateFile /etc/letsencrypt/live/techuniverse.duckdns.org/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse.duckdns.org/privkey.pem
+    DocumentRoot /var/www/frontend
 
-    ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
 
-    # =========================
-    # BACKEND LARAVEL
-    # =========================
+    # SOLO API
+    ProxyPreserveHost On
     ProxyPass /api http://${BACKEND_HOST}/api
     ProxyPassReverse /api http://${BACKEND_HOST}/api
-
-    ProxyPass /admin http://${BACKEND_HOST}/admin
-    ProxyPassReverse /admin http://${BACKEND_HOST}/admin
-
-    ProxyPass /livewire http://${BACKEND_HOST}/livewire
-    ProxyPassReverse /livewire http://${BACKEND_HOST}/livewire
-
-    ProxyPass /vendor http://${BACKEND_HOST}/vendor
-    ProxyPassReverse /vendor http://${BACKEND_HOST}/vendor
-
-    ProxyPass /storage http://${BACKEND_HOST}/storage
-    ProxyPassReverse /storage http://${BACKEND_HOST}/storage
-
-    # =========================
-    # FRONTEND ANGULAR
-    # =========================
-    DocumentRoot /var/www/frontend
 
     <Directory /var/www/frontend>
         AllowOverride All
@@ -121,10 +99,11 @@ systemctl restart apache2
 chown -R www-data:www-data /var/www/frontend
 
 # =========================
-# CODEDEPLOY AGENT
+# CODEDEPLOY AGENT (CORRECTO)
 # =========================
+cd /tmp
 wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
-chmod +x ./install
+chmod +x install
 ./install auto
 
 systemctl enable codedeploy-agent

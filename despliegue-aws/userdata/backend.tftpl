@@ -1,26 +1,40 @@
 #!/bin/bash
 exec > /var/log/userdata.log 2>&1
 
-apt-get update -y
-apt-get install -y software-properties-common curl git unzip ruby-full wget
+set -e
 
 # =========================
-# APACHE + PHP
+# BASE
 # =========================
-apt-get install -y apache2 php php-cli php-mysql php-xml \
+apt-get update -y
+apt-get install -y software-properties-common curl git unzip wget \
+  apache2 ruby-full snapd
+
+# =========================
+# PHP
+# =========================
+apt-get install -y php php-cli php-mysql php-xml \
 php-mbstring php-curl php-zip php-bcmath php-intl \
 libapache2-mod-php
 
+# =========================
+# APACHE MODULES
+# =========================
 a2enmod rewrite headers proxy proxy_http ssl
-
 systemctl enable apache2
 
 # =========================
-# VIRTUAL HOST (backend API)
+# APP DIR
 # =========================
-cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
+mkdir -p /var/www/api
+chown -R www-data:www-data /var/www/api
+
+# =========================
+# VIRTUALHOST (ADMIN ONLY)
+# =========================
+cat > /etc/apache2/sites-available/admin.conf << 'EOF'
 <VirtualHost *:80>
-    ServerName backend.techuniverse.com
+    ServerName admin-techuniverse.duckdns.org
     DocumentRoot /var/www/api/public
 
     <Directory /var/www/api/public>
@@ -31,42 +45,80 @@ cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 </VirtualHost>
 EOF
 
-a2ensite techuniverse.conf
+a2ensite admin.conf
 a2dissite 000-default.conf
-
-mkdir -p /var/www/api
-
-# ⚠️ IMPORTANTE: NO hacer chown aquí global
-chown www-data:www-data /var/www/api || true
 
 systemctl restart apache2
 
 # =========================
-# ENV BASE (solo plantilla)
+# DUCKDNS (solo inicial)
+# =========================
+IP=$(curl -s http://checkip.amazonaws.com)
+curl -s "https://www.duckdns.org/update?domains=admin-techuniverse&token=${DUCKDNS_TOKEN}&ip=$IP"
+
+# =========================
+# CERTBOT (HTTPS REAL)
+# =========================
+snap install core
+snap refresh core
+snap install --classic certbot
+ln -sf /snap/bin/certbot /usr/bin/certbot
+
+if [ ! -d /etc/letsencrypt/live/admin-techuniverse.duckdns.org ]; then
+  certbot --apache \
+    -d admin-techuniverse.duckdns.org \
+    --non-interactive \
+    --agree-tos \
+    -m tuemail@gmail.com \
+    --redirect
+fi
+
+# =========================
+# HEADERS IMPORTANTES (FILAMENT + HTTPS FIX)
+# =========================
+cat > /etc/apache2/conf-available/laravel-headers.conf << 'EOF'
+RequestHeader set X-Forwarded-Proto "https"
+RequestHeader set X-Forwarded-Port "443"
+RequestHeader set X-Forwarded-Host "admin-techuniverse.duckdns.org"
+EOF
+
+a2enconf laravel-headers
+
+# =========================
+# ENV BASE
 # =========================
 cat > /var/www/.env.base << EOF
 APP_ENV=production
 APP_DEBUG=false
 APP_KEY=
+
+APP_URL=https://admin-techuniverse.duckdns.org
+ASSET_URL=https://admin-techuniverse.duckdns.org
+
 DB_CONNECTION=mysql
 DB_HOST=${DB_HOST}
 DB_PORT=3306
 DB_DATABASE=techuniverse
 DB_USERNAME=root
 DB_PASSWORD=${DB_ROOT_PASSWORD}
-APP_URL=https://techuniverse.duckdns.org
-ASSET_URL=https://techuniverse.duckdns.org
 EOF
-
-php artisan optimize:clear
-php artisan config:cache
 
 # =========================
 # CODEDEPLOY AGENT
 # =========================
-wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
-chmod +x ./install
+cd /tmp
+
+curl -O https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+chmod +x install
 ./install auto
 
 systemctl enable codedeploy-agent
 systemctl start codedeploy-agent
+
+# =========================
+# PERMISOS FINALES
+# =========================
+chown -R www-data:www-data /var/www/api
+chmod -R 775 /var/www/api/storage /var/www/api/bootstrap/cache
+
+systemctl restart apache2
