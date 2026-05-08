@@ -1,5 +1,6 @@
 #!/bin/bash
 exec > /var/log/userdata.log 2>&1
+set -e
 
 # =========================
 # BASE
@@ -28,7 +29,7 @@ mkdir -p /var/www/api
 chown -R www-data:www-data /var/www/api
 
 # =========================
-# VIRTUALHOST (ADMIN ONLY)
+# VHOST HTTP (OBLIGATORIO PARA CERTBOT)
 # =========================
 cat > /etc/apache2/sites-available/admin.conf << 'EOF'
 <VirtualHost *:80>
@@ -45,17 +46,16 @@ EOF
 
 a2ensite admin.conf
 a2dissite 000-default.conf
-
 systemctl restart apache2
 
 # =========================
-# DUCKDNS (solo inicial)
+# DUCKDNS
 # =========================
 IP=$(curl -s http://checkip.amazonaws.com)
 curl -s "https://www.duckdns.org/update?domains=admin-techuniverse&token=${DUCKDNS_TOKEN}&ip=$IP"
 
 # =========================
-# CERTBOT (HTTPS REAL)
+# CERTBOT (GENERA SSL LIMPIO)
 # =========================
 snap install core
 snap refresh core
@@ -67,12 +67,12 @@ if [ ! -d /etc/letsencrypt/live/admin-techuniverse.duckdns.org ]; then
     -d admin-techuniverse.duckdns.org \
     --non-interactive \
     --agree-tos \
-    -m tuemail@gmail.com \
+    -m ivan.rios1712@gmail.com \
     --redirect
 fi
 
 # =========================
-# HEADERS IMPORTANTES (FILAMENT + HTTPS FIX)
+# HEADERS LARAVEL / FILAMENT
 # =========================
 cat > /etc/apache2/conf-available/laravel-headers.conf << 'EOF'
 RequestHeader set X-Forwarded-Proto "https"
@@ -114,7 +114,7 @@ systemctl enable codedeploy-agent
 systemctl start codedeploy-agent
 
 # =========================
-# PERMISOS FINALES
+# PERMISOS
 # =========================
 chown -R www-data:www-data /var/www/api
 chmod -R 775 /var/www/api/storage /var/www/api/bootstrap/cache
