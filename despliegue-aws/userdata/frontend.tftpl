@@ -1,8 +1,14 @@
 #!/bin/bash
 exec > /var/log/userdata.log 2>&1
 
+set -e
+
+# =========================
+# DEPENDENCIAS BASE
+# =========================
 apt-get update -y
-DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 curl unzip snapd
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  apache2 curl unzip snapd ruby-full wget
 
 # =========================
 # APACHE MODULES
@@ -11,7 +17,7 @@ a2enmod rewrite ssl headers proxy proxy_http proxy_wstunnel
 systemctl enable apache2
 
 # =========================
-# DUCKDNS (solo si necesitas IP dinámica)
+# DUCKDNS (opcional IP dinámica)
 # =========================
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
@@ -25,7 +31,7 @@ snap install --classic certbot
 ln -sf /snap/bin/certbot /usr/bin/certbot
 
 # =========================
-# VHOST HTTP (solo temporal)
+# VHOST HTTP (temporal)
 # =========================
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
@@ -48,7 +54,7 @@ systemctl restart apache2
 sleep 10
 
 # =========================
-# CERTBOT (solo primera vez)
+# CERTBOT (solo si no existe)
 # =========================
 if [ ! -d /etc/letsencrypt/live/techuniverse.duckdns.org ]; then
   certbot --apache \
@@ -59,7 +65,7 @@ if [ ! -d /etc/letsencrypt/live/techuniverse.duckdns.org ]; then
 fi
 
 # =========================
-# VHOST FINAL (HTTPS + PROXY)
+# VHOST HTTPS FINAL (ANGULAR + PROXY)
 # =========================
 cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 <IfModule mod_ssl.c>
@@ -94,7 +100,7 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     ProxyPassReverse /storage http://${BACKEND_HOST}/storage
 
     # =========================
-    # FRONTEND ANGULAR SPA
+    # FRONTEND ANGULAR
     # =========================
     DocumentRoot /var/www/frontend
 
@@ -109,10 +115,27 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 </IfModule>
 EOF
 
-a2enmod ssl proxy proxy_http headers rewrite
 systemctl restart apache2
 
 # =========================
 # PERMISOS
 # =========================
 chown -R www-data:www-data /var/www/frontend
+
+# =========================
+# CODEDEPLOY AGENT (CLAVE)
+# =========================
+echo "Instalando CodeDeploy Agent..."
+
+apt-get install -y ruby wget
+
+cd /home/ubuntu
+wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+
+chmod +x ./install
+./install auto
+
+systemctl enable codedeploy-agent
+systemctl start codedeploy-agent
+
+systemctl status codedeploy-agent || true
