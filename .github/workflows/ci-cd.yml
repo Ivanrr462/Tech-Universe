@@ -1,12 +1,6 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - "techuniverse-api/**"
-      - "Angular-frontend/**"
-      - "React-components/**"
   workflow_dispatch:
 
 jobs:

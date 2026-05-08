@@ -2,9 +2,9 @@
 exec > /var/log/userdata.log 2>&1
 
 apt-get update -y
-apt-get install -y apache2 curl unzip ruby-full wget snapd
+DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 curl unzip ruby-full wget snapd
 
-# Habilitar módulos necesarios
+# Habilitar módulos DESPUÉS de instalar Apache
 a2enmod proxy
 a2enmod proxy_http
 a2enmod rewrite
@@ -64,7 +64,7 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     Include /etc/letsencrypt/options-ssl-apache.conf
     SSLCertificateFile /etc/letsencrypt/live/techuniverse.duckdns.org/fullchain.pem
     SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse.duckdns.org/privkey.pem
-    
+
     ProxyPreserveHost On
 
     ProxyPass /api/ http://${BACKEND_HOST}/api/
