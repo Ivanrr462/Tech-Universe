@@ -55,7 +55,11 @@ DB_DATABASE=techuniverse
 DB_USERNAME=root
 DB_PASSWORD=${DB_ROOT_PASSWORD}
 APP_URL=https://techuniverse.duckdns.org
+ASSET_URL=https://techuniverse.duckdns.org
 EOF
+
+php artisan optimize:clear
+php artisan config:cache
 
 # =========================
 # CODEDEPLOY AGENT
