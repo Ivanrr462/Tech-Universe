@@ -123,27 +123,11 @@ systemctl restart apache2
 chown -R www-data:www-data /var/www/frontend
 
 # =========================
-# CODEDEPLOY AGENT FIX REAL
+# CODEDEPLOY AGENT
 # =========================
+wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+chmod +x ./install
+./install auto
 
-apt-get update -y
-apt-get install -y ruby wget
-
-cd /home/ubuntu
-
-# limpiar restos si existen
-rm -f codedeploy-agent_*.deb
-
-# descargar paquete oficial
-wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/codedeploy-agent_1.7.1-1504_all.deb
-
-# instalar correctamente
-dpkg -i codedeploy-agent_1.7.1-1504_all.deb || apt-get install -f -y
-
-# habilitar servicio
-systemctl daemon-reexec
 systemctl enable codedeploy-agent
 systemctl start codedeploy-agent
-
-# verificación (IMPORTANTE)
-systemctl status codedeploy-agent || true
