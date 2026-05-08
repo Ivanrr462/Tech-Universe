@@ -63,11 +63,10 @@ cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 EOF
 
 # Parchear el VirtualHost SSL que generó Certbot
-cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
+cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << 'EOF'
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
     ServerName techuniverse.duckdns.org
-    DocumentRoot /var/www/frontend
 
     Include /etc/letsencrypt/options-ssl-apache.conf
     SSLCertificateFile /etc/letsencrypt/live/techuniverse.duckdns.org/fullchain.pem
@@ -76,22 +75,43 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
+    RequestHeader set X-Forwarded-Host "%{HTTP_HOST}s"
 
-    ProxyPass /api/ http://${BACKEND_HOST}/api/
-    ProxyPassReverse /api/ http://${BACKEND_HOST}/api/
+    # =========================
+    # BACKEND LARAVEL (API + FILAMENT)
+    # =========================
+    ProxyPass /api http://${BACKEND_HOST}/api
+    ProxyPassReverse /api http://${BACKEND_HOST}/api
 
     ProxyPass /admin http://${BACKEND_HOST}/admin
     ProxyPassReverse /admin http://${BACKEND_HOST}/admin
+
+    ProxyPass /livewire http://${BACKEND_HOST}/livewire
+    ProxyPassReverse /livewire http://${BACKEND_HOST}/livewire
+
+    ProxyPass /vendor http://${BACKEND_HOST}/vendor
+    ProxyPassReverse /vendor http://${BACKEND_HOST}/vendor
+
+    ProxyPass /storage http://${BACKEND_HOST}/storage
+    ProxyPassReverse /storage http://${BACKEND_HOST}/storage
+
+    # =========================
+    # FRONTEND ANGULAR (SPA)
+    # =========================
+    DocumentRoot /var/www/frontend
 
     <Directory /var/www/frontend>
         AllowOverride All
         Require all granted
         Options -Indexes +FollowSymLinks
+
+        # CLAVE PARA ANGULAR ROUTER
         FallbackResource /index.html
     </Directory>
 
     ErrorLog /var/log/apache2/techuniverse-ssl-error.log
     CustomLog /var/log/apache2/techuniverse-ssl-access.log combined
+
 </VirtualHost>
 </IfModule>
 EOF
