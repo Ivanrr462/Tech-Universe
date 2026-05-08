@@ -28,7 +28,7 @@ php artisan key:generate --force --no-interaction
 # MIGRACIONES
 # =========================
 php artisan migrate --force --no-interaction
-php artisan db:seed --force --no-interaction
+#php artisan db:seed --force --no-interaction
 
 # =========================
 # FRONTEND
