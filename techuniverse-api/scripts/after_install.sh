@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+export APP_ENV=production
+export APP_DEBUG=false
+export COMPOSER_NO_INTERACTION=1
+export CI=true
+export SHELL_VERBOSITY=0
+export DEBIAN_FRONTEND=noninteractive
+
 cd /var/www/api
 
 # =========================
@@ -18,7 +25,7 @@ fi
 if [ ! -f /var/www/api/.env ]; then
   cp /var/www/.env.base /var/www/api/.env
 fi
-php artisan key:generate --force
+php artisan key:generate --force --no-interaction
 
 # =========================
 # MIGRACIONES
@@ -34,10 +41,10 @@ npm run build
 # =========================
 # CACHE LARAVEL
 # =========================
-php artisan optimize:clear
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+php artisan optimize:clear --no-interaction
+php artisan config:cache --no-interaction
+php artisan route:cache --no-interaction
+php artisan view:cache --no-interaction
 
 # =========================
 # PERMISOS CORRECTOS
