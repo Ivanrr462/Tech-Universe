@@ -126,7 +126,7 @@ resource "aws_vpc_security_group_ingress_rule" "https_backend" {
   from_port                    = 443
   to_port                      = 443
   ip_protocol                  = "TCP"
-  referenced_security_group_id = aws_security_group.FrontEnd.id
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 // db
@@ -240,5 +240,5 @@ resource "aws_route53_record" "backend_record" {
   name    = "backend.${var.domain}"
   zone_id = aws_route53_zone.default.zone_id
   ttl     = 3600
-  records = [aws_instance.BackEnd.public_ip]
+  records = [aws_instance.BackEnd.private_ip]
 }
