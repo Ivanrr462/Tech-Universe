@@ -9,11 +9,12 @@ a2enmod proxy
 a2enmod proxy_http
 a2enmod rewrite
 a2enmod ssl
-a2enmod headers  
+a2enmod headers
+a2enmod proxy_balancer
+a2enmod proxy_wstunnel
 
 # Actualizar IP en DuckDNS usando IMDSv2
-TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
-PUBLIC_IP=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4)
+PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
 
 # Esperar propagación DNS
@@ -41,16 +42,13 @@ a2ensite techuniverse.conf
 a2dissite 000-default.conf
 mkdir -p /var/www/frontend
 systemctl restart apache2
+sleep 10
 
-# Esperar a que Apache arranque
-sleep 30
-
-# Comprobar que Apache está corriendo antes de lanzar Certbot
-if systemctl is-active --quiet apache2; then
-    certbot --apache -d techuniverse.duckdns.org --non-interactive --agree-tos -m ivan.rios1712@gmail.com
-else
-    echo "Apache no está corriendo, no se puede generar el certificado"
-fi
+certbot --apache \
+  -d techuniverse.duckdns.org \
+  --non-interactive \
+  --agree-tos \
+  -m ivan.rios1712@gmail.com
 
 # VirtualHost HTTP → redirige a HTTPS
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
