@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -x
 
 export APP_ENV=production
 export APP_DEBUG=false
@@ -30,7 +30,8 @@ php artisan key:generate --force --no-interaction
 # =========================
 # MIGRACIONES
 # =========================
-php artisan migrate:fresh --seed
+php artisan migrate --force --no-interaction
+php artisan db:seed --class=CoreSeeder --force --no-interaction
 
 # =========================
 # FRONTEND (FILAMENT + VITE)
@@ -41,7 +42,6 @@ npm run build
 # =========================
 # CACHE LARAVEL
 # =========================
-php artisan optimize:clear --no-interaction
 php artisan config:cache --no-interaction
 php artisan route:cache --no-interaction
 php artisan view:cache --no-interaction
