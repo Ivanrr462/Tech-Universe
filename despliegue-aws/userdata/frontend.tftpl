@@ -2,30 +2,31 @@
 exec > /var/log/userdata.log 2>&1
 
 apt-get update -y
-DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 curl unzip ruby-full wget snapd
+DEBIAN_FRONTEND=noninteractive apt-get install -y apache2 curl unzip snapd
 
-# Habilitar módulos DESPUÉS de instalar Apache
-a2enmod proxy
-a2enmod proxy_http
-a2enmod rewrite
-a2enmod ssl
-a2enmod headers
-a2enmod proxy_balancer
-a2enmod proxy_wstunnel
+# =========================
+# APACHE MODULES
+# =========================
+a2enmod rewrite ssl headers proxy proxy_http proxy_wstunnel
+systemctl enable apache2
 
-# Actualizar IP en DuckDNS usando IMDSv2
+# =========================
+# DUCKDNS (solo si necesitas IP dinámica)
+# =========================
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
 
-# Esperar propagación DNS
-sleep 30
-
-# Certbot
-snap install core && snap refresh core
+# =========================
+# CERTBOT
+# =========================
+snap install core
+snap refresh core
 snap install --classic certbot
 ln -sf /snap/bin/certbot /usr/bin/certbot
 
-# VirtualHost HTTP temporal para que Certbot pueda verificar
+# =========================
+# VHOST HTTP (solo temporal)
+# =========================
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
     ServerName techuniverse.duckdns.org
@@ -40,30 +41,30 @@ EOF
 
 a2ensite techuniverse.conf
 a2dissite 000-default.conf
+
 mkdir -p /var/www/frontend
 systemctl restart apache2
+
 sleep 10
 
-certbot --apache \
-  -d techuniverse.duckdns.org \
-  --non-interactive \
-  --agree-tos \
-  -m ivan.rios1712@gmail.com
+# =========================
+# CERTBOT (solo primera vez)
+# =========================
+if [ ! -d /etc/letsencrypt/live/techuniverse.duckdns.org ]; then
+  certbot --apache \
+    -d techuniverse.duckdns.org \
+    --non-interactive \
+    --agree-tos \
+    -m tuemail@gmail.com
+fi
 
-# VirtualHost HTTP → redirige a HTTPS
-cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
-<VirtualHost *:80>
-    ServerName techuniverse.duckdns.org
-    RewriteEngine on
-    RewriteCond %%{SERVER_NAME} =techuniverse.duckdns.org
-    RewriteRule ^ https://%%{SERVER_NAME}%%{REQUEST_URI} [END,NE,R=permanent]
-</VirtualHost>
-EOF
-
-# Parchear el VirtualHost SSL que generó Certbot
-cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << 'EOF'
+# =========================
+# VHOST FINAL (HTTPS + PROXY)
+# =========================
+cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
+
     ServerName techuniverse.duckdns.org
 
     Include /etc/letsencrypt/options-ssl-apache.conf
@@ -73,10 +74,9 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << 'EOF'
     ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
-    RequestHeader set X-Forwarded-Host "%%{HTTP_HOST}s"
 
     # =========================
-    # BACKEND LARAVEL (API + FILAMENT)
+    # BACKEND LARAVEL
     # =========================
     ProxyPass /api http://${BACKEND_HOST}/api
     ProxyPassReverse /api http://${BACKEND_HOST}/api
@@ -94,7 +94,7 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << 'EOF'
     ProxyPassReverse /storage http://${BACKEND_HOST}/storage
 
     # =========================
-    # FRONTEND ANGULAR (SPA)
+    # FRONTEND ANGULAR SPA
     # =========================
     DocumentRoot /var/www/frontend
 
@@ -102,30 +102,17 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << 'EOF'
         AllowOverride All
         Require all granted
         Options -Indexes +FollowSymLinks
-
-        # CLAVE PARA ANGULAR ROUTER
         FallbackResource /index.html
     </Directory>
-
-    ErrorLog /var/log/apache2/techuniverse-ssl-error.log
-    CustomLog /var/log/apache2/techuniverse-ssl-access.log combined
 
 </VirtualHost>
 </IfModule>
 EOF
 
-chown -R www-data:www-data /var/www/frontend
-systemctl enable apache2
+a2enmod ssl proxy proxy_http headers rewrite
 systemctl restart apache2
 
-# Cron para actualizar DuckDNS en cada reinicio
-cat > /etc/cron.d/duckdns << CRON
-@reboot root TOKEN=\$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") && PUBLIC_IP=\$(curl -s -H "X-aws-ec2-metadata-token: \$TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4) && curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=\$PUBLIC_IP"
-CRON
-
-# CodeDeploy Agent
-wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
-chmod +x ./install
-./install auto
-systemctl enable codedeploy-agent
-systemctl start codedeploy-agent
+# =========================
+# PERMISOS
+# =========================
+chown -R www-data:www-data /var/www/frontend

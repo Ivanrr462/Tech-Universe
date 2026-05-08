@@ -3,51 +3,39 @@ set -e
 
 cd /var/www/api
 
-export PATH=$PATH:/usr/local/bin:/usr/bin
-export APP_ENV=production
-export APP_DEBUG=false
-export COMPOSER_NO_INTERACTION=1
-
 # =========================
-# DEPENDENCIAS
+# PERMISOS (SIEMPRE AL INICIO DEL DEPLOY)
 # =========================
-if ! command -v composer >/dev/null 2>&1; then
-  curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-fi
+chown -R www-data:www-data /var/www/api
 
-/usr/local/bin/composer install --no-dev --optimize-autoloader
+chmod -R 775 storage bootstrap/cache
 
 # =========================
 # ENV
 # =========================
-cp -n /var/www/.env.base /var/www/api/.env
+if [ ! -f .env ]; then
+  cp /var/www/.env.base .env
+fi
 
-php artisan key:generate --force --no-interaction
+php artisan key:generate --force || true
 
 # =========================
-# MIGRACIONES
+# LARAVEL (SIN npm, SIN composer si usas build en CI)
 # =========================
 php artisan migrate --force --no-interaction
-#php artisan db:seed --force --no-interaction
+
+# ⚠️ seed SOLO si es necesario
+# php artisan db:seed --force --no-interaction
 
 # =========================
-# FRONTEND
-# =========================
-npm install
-npm run build
-
-# =========================
-# PERMISOS (ESTO VA AL FINAL)
-# =========================
-chown -R www-data:www-data /var/www/api
-
-chmod -R 775 /var/www/api/storage
-chmod -R 775 /var/www/api/bootstrap/cache
-
-# =========================
-# CACHE (SIEMPRE AL FINAL)
+# CACHE LIMPIO
 # =========================
 php artisan optimize:clear
-php artisan config:cache --no-interaction
-php artisan route:cache --no-interaction
-php artisan view:cache --no-interaction
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# =========================
+# RESTART
+# =========================
+systemctl restart apache2 || true

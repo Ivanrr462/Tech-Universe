@@ -4,21 +4,20 @@ exec > /var/log/userdata.log 2>&1
 apt-get update -y
 apt-get install -y software-properties-common curl git unzip ruby-full wget
 
-# PHP (última versión disponible en Ubuntu 24.04)
-apt-get install -y php php-cli php-mysql php-xml \
-  php-mbstring php-curl php-zip php-bcmath php-intl \
-  libapache2-mod-php
+# =========================
+# APACHE + PHP
+# =========================
+apt-get install -y apache2 php php-cli php-mysql php-xml \
+php-mbstring php-curl php-zip php-bcmath php-intl \
+libapache2-mod-php
 
-# Habilitar módulos de Apache
-a2enmod rewrite
-a2enmod php$(php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;")
+a2enmod rewrite headers proxy proxy_http ssl
 
-# Apache
-apt-get install -y apache2
+systemctl enable apache2
 
-export HOME=/root
-
-# VirtualHost de Apache para Laravel
+# =========================
+# VIRTUAL HOST (backend API)
+# =========================
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
     ServerName backend.techuniverse.com
@@ -29,23 +28,22 @@ cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
         Require all granted
         Options -Indexes +FollowSymLinks
     </Directory>
-
-    ErrorLog /var/log/apache2/techuniverse-error.log
-    CustomLog /var/log/apache2/techuniverse-access.log combined
 </VirtualHost>
 EOF
 
-# Activar el sitio y desactivar el default
 a2ensite techuniverse.conf
 a2dissite 000-default.conf
 
 mkdir -p /var/www/api
-chown -R www-data:www-data /var/www/api
 
-systemctl enable apache2
+# ⚠️ IMPORTANTE: NO hacer chown aquí global
+chown www-data:www-data /var/www/api || true
+
 systemctl restart apache2
 
-# .env base para cuando llegue el pipeline de CD
+# =========================
+# ENV BASE (solo plantilla)
+# =========================
 cat > /var/www/.env.base << EOF
 APP_ENV=production
 APP_DEBUG=false
@@ -59,9 +57,12 @@ DB_PASSWORD=${DB_ROOT_PASSWORD}
 APP_URL=https://techuniverse.duckdns.org
 EOF
 
-# CodeDeploy Agent
+# =========================
+# CODEDEPLOY AGENT
+# =========================
 wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
 chmod +x ./install
 ./install auto
+
 systemctl enable codedeploy-agent
 systemctl start codedeploy-agent
