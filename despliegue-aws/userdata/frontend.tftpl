@@ -75,7 +75,7 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << 'EOF'
     ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
-    RequestHeader set X-Forwarded-Host "%{HTTP_HOST}s"
+    RequestHeader set X-Forwarded-Host "%%{HTTP_HOST}s"
 
     # =========================
     # BACKEND LARAVEL (API + FILAMENT)
