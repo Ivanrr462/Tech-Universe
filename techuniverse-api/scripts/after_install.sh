@@ -6,7 +6,8 @@ cd /var/www/api
 # =========================
 # DEPENDENCIAS PHP
 # =========================
-composer install --no-dev --optimize-autoloader
+export PATH=$PATH:/usr/local/bin:/usr/bin
+/usr/local/bin/composer install --no-dev --optimize-autoloader
 
 php artisan key:generate --force
 
