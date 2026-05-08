@@ -5,11 +5,10 @@ exec > /var/log/userdata.log 2>&1
 # BASE
 # =========================
 apt-get update -y
-apt-get install -y software-properties-common curl git unzip wget \
-  apache2 ruby-full snapd
+apt-get install -y apache2 curl unzip wget git snapd
 
 # =========================
-# PHP
+# PHP + EXTENSIONES
 # =========================
 apt-get install -y php php-cli php-mysql php-xml \
 php-mbstring php-curl php-zip php-bcmath php-intl \
@@ -18,7 +17,7 @@ libapache2-mod-php
 # =========================
 # APACHE MODULES
 # =========================
-a2enmod rewrite headers proxy proxy_http ssl
+a2enmod rewrite ssl headers
 systemctl enable apache2
 
 # =========================
@@ -28,7 +27,7 @@ mkdir -p /var/www/api
 chown -R www-data:www-data /var/www/api
 
 # =========================
-# VHOST HTTP (OBLIGATORIO PARA CERTBOT)
+# VHOST HTTP (solo para Certbot / redirect)
 # =========================
 cat > /etc/apache2/sites-available/admin.conf << 'EOF'
 <VirtualHost *:80>
@@ -45,41 +44,62 @@ EOF
 
 a2ensite admin.conf
 a2dissite 000-default.conf
-systemctl restart apache2
+
+systemctl reload apache2
 
 # =========================
-# DUCKDNS
+# DUCKDNS (solo inicial)
 # =========================
 IP=$(curl -s http://checkip.amazonaws.com)
 curl -s "https://www.duckdns.org/update?domains=admin-techuniverse&token=${DUCKDNS_TOKEN}&ip=$IP"
 
 # =========================
-# CERTBOT (GENERA SSL LIMPIO)
+# CERTBOT
 # =========================
 snap install core
 snap refresh core
 snap install --classic certbot
 ln -sf /snap/bin/certbot /usr/bin/certbot
 
-if [ ! -d /etc/letsencrypt/live/admin-techuniverse.duckdns.org ]; then
-  certbot --apache \
-    -d admin-techuniverse.duckdns.org \
-    --non-interactive \
-    --agree-tos \
-    -m ivan.rios1712@gmail.com \
-    --redirect
-fi
+certbot --apache \
+  -d admin-techuniverse.duckdns.org \
+  --non-interactive \
+  --agree-tos \
+  -m ivan.rios1712@gmail.com \
+  --redirect || true
 
 # =========================
-# HEADERS LARAVEL / FILAMENT
+# FORZAR VHOST HTTPS (ESTABLE Y FIABLE)
 # =========================
-cat > /etc/apache2/conf-available/laravel-headers.conf << 'EOF'
-RequestHeader set X-Forwarded-Proto "https"
-RequestHeader set X-Forwarded-Port "443"
-RequestHeader set X-Forwarded-Host "admin-techuniverse.duckdns.org"
+cat > /etc/apache2/sites-available/admin-le-ssl.conf << EOF
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+
+    ServerName admin-techuniverse.duckdns.org
+
+    DocumentRoot /var/www/api/public
+
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/admin-techuniverse.duckdns.org/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/admin-techuniverse.duckdns.org/privkey.pem
+
+    RequestHeader set X-Forwarded-Proto "https"
+    RequestHeader set X-Forwarded-Port "443"
+    RequestHeader set X-Forwarded-Host "admin-techuniverse.duckdns.org"
+
+    <Directory /var/www/api/public>
+        AllowOverride All
+        Require all granted
+        Options -Indexes +FollowSymLinks
+    </Directory>
+
+</VirtualHost>
+</IfModule>
 EOF
 
-a2enconf laravel-headers
+a2ensite admin-le-ssl.conf
+a2enmod ssl headers
+systemctl reload apache2
 
 # =========================
 # ENV BASE

@@ -122,10 +122,10 @@ resource "aws_vpc_security_group_ingress_rule" "https_frontend" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "https_backend" {
-  security_group_id            = aws_security_group.BackEnd.id
-  from_port                    = 443
-  to_port                      = 443
-  ip_protocol                  = "TCP"
+  security_group_id = aws_security_group.BackEnd.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "TCP"
   cidr_ipv4         = "0.0.0.0/0"
 }
 
@@ -150,13 +150,13 @@ resource "aws_instance" "Bastion" {
 }
 
 resource "aws_instance" "FrontEnd" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = var.Instance_Type
-  iam_instance_profile        = var.Instance_Profile
-  key_name                    = var.key_name
-  vpc_security_group_ids      = [aws_security_group.all.id, aws_security_group.FrontEnd.id]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.Instance_Type
+  iam_instance_profile   = var.Instance_Profile
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.all.id, aws_security_group.FrontEnd.id]
   user_data = templatefile("userdata/frontend.tftpl", {
-    BACKEND_HOST = aws_instance.BackEnd.private_ip
+    BACKEND_HOST  = aws_instance.BackEnd.private_ip
     DUCKDNS_TOKEN = var.duckdns_token
   })
   user_data_replace_on_change = true
