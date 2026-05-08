@@ -21,8 +21,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::apiResource('/productos', ProductoController::class, ['as' => 'api'])->only(['index', 'show']);
 Route::get('productos/count', [ProductoController::class, 'count']);
+Route::apiResource('/productos', ProductoController::class, ['as' => 'api'])->only(['index', 'show']);
 Route::get('/categoria/productos', [CategoriaController::class, 'indexProductos'])->name('api.categoria.productos');
 Route::apiResource('/categoria', CategoriaController::class, ['as' => 'api'])->only(['index', 'show']);
 Route::get('/especificacion/productos', [EspecifiacionController::class, 'indexProductos'])->name('api.especificacion.productos');
@@ -37,11 +37,25 @@ Route::middleware(['auth:sanctum', 'rol:usuario'])->group(function () {
 
 // Rutas de admin
 Route::middleware(['auth:sanctum', 'rol:admin'])->group(function () {
-    Route::apiResource('/deseos', WishlistController::class, ['as' => 'api'])->only(['index']);
-    Route::apiResource('/productos', ProductoController::class, ['as' => 'api'])->except(['index', 'show']);
-    Route::apiResource('/categoria', CategoriaController::class, ['as' => 'api'])->except(['index', 'show']);
+    Route::apiResource('/deseos', WishlistController::class)->only(['index'])->names([
+        'index' => 'api.admin.deseos.index',
+    ]);
+    Route::apiResource('/productos', ProductoController::class)->except(['index', 'show'])->names([
+        'store'   => 'api.admin.productos.store',
+        'update'  => 'api.admin.productos.update',
+        'destroy' => 'api.admin.productos.destroy',
+    ]);
+    Route::apiResource('/categoria', CategoriaController::class)->except(['index', 'show'])->names([
+        'store'   => 'api.admin.categoria.store',
+        'update'  => 'api.admin.categoria.update',
+        'destroy' => 'api.admin.categoria.destroy',
+    ]);
     Route::apiResource('/especificacion/productos', ProductoEspecifiacionController::class, ['as' => 'api'])->only(['store', 'update', 'destroy']);
-    Route::apiResource('/especificacion', EspecifiacionController::class, ['as' => 'api'])->except(['index', 'show']);
+    Route::apiResource('/especificacion', EspecifiacionController::class)->except(['index', 'show'])->names([
+        'store'   => 'api.admin.especificacion.store',
+        'update'  => 'api.admin.especificacion.update',
+        'destroy' => 'api.admin.especificacion.destroy',
+    ]);
     Route::apiResource('/usuarios', UserController::class, ['as' => 'api']);
 });
 
