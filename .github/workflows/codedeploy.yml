@@ -137,7 +137,7 @@ jobs:
       - name: Crear ZIP frontend
         run: |
           mkdir -p deploy
-          cp -r Angular-frontend/dist/* deploy/
+          cp -r Angular-frontend/dist/*/browser deploy/browser
           cp Angular-frontend/appspec.yml deploy/ || true
           cp -r Angular-frontend/scripts deploy/ || true
 
