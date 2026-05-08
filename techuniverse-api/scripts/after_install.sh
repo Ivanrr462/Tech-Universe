@@ -15,6 +15,9 @@ fi
 
 /usr/local/bin/composer install --no-dev --optimize-autoloader
 
+if [ ! -f /var/www/api/.env ]; then
+  cp /var/www/.env.base /var/www/api/.env
+fi
 php artisan key:generate --force
 
 # =========================
