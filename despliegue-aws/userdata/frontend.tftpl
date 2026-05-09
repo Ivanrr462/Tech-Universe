@@ -18,7 +18,7 @@ systemctl enable apache2
 # DUCKDNS
 # =========================
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
-curl -s "https://www.duckdns.org/update?domains=techuniverse2&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
+curl -s "https://www.duckdns.org/update?domains=techuniverse3&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
 
 # =========================
 # CERTBOT
@@ -39,7 +39,7 @@ chown -R www-data:www-data /var/www/frontend
 # =========================
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
-    ServerName techuniverse2.duckdns.org
+    ServerName techuniverse3.duckdns.org
     DocumentRoot /var/www/frontend
 
     <Directory /var/www/frontend>
@@ -58,13 +58,13 @@ sleep 30
 # =========================
 # CERTBOT (HTTPS)
 # =========================
-CERT_PATH="/etc/letsencrypt/live/techuniverse2.duckdns.org/fullchain.pem"
+CERT_PATH="/etc/letsencrypt/live/techuniverse3.duckdns.org/fullchain.pem"
 
 if [ ! -f "$CERT_PATH" ]; then
   echo "Intentando generar certificado SSL..."
 
   certbot --apache \
-    -d techuniverse2.duckdns.org \
+    -d techuniverse3.duckdns.org \
     --non-interactive \
     --agree-tos \
     -m ivan.rios1712@gmail.com
@@ -92,12 +92,12 @@ fi
 cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
-    ServerName techuniverse2.duckdns.org
+    ServerName techuniverse3.duckdns.org
 
     SSLEngine on
     Include /etc/letsencrypt/options-ssl-apache.conf
-    SSLCertificateFile /etc/letsencrypt/live/techuniverse2.duckdns.org/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse2.duckdns.org/privkey.pem
+    SSLCertificateFile /etc/letsencrypt/live/techuniverse3.duckdns.org/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse3.duckdns.org/privkey.pem
 
     DocumentRoot /var/www/frontend
 
