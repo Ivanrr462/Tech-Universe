@@ -102,28 +102,49 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 
     DocumentRoot /var/www/frontend
 
+    # Preserve host and forward proto/port
     ProxyPreserveHost On
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
+    RequestHeader set X-Forwarded-For "%%{REMOTE_ADDR}s"
 
-    # ✅ BACKEND (MUY IMPORTANTE: rutas explícitas)
-    ProxyPass "/api/" "http://${BACKEND_HOST}/api/"
-    ProxyPassReverse "/api/" "http://${BACKEND_HOST}/api/"
+    # -------------------------
+    # BACKEND (rutas explícitas)
+    # -------------------------
+    ProxyPass        "/api/"  "http://${BACKEND_HOST}/api/"
+    ProxyPassReverse "/api/"  "http://${BACKEND_HOST}/api/"
 
-    ProxyPass "/admin/" "http://${BACKEND_HOST}/admin/"
-    ProxyPassReverse "/admin/" "http://${BACKEND_HOST}/admin/"
+    ProxyPass        "/admin"  "http://${BACKEND_HOST}/admin"
+    ProxyPassReverse "/admin"  "http://${BACKEND_HOST}/admin"
 
-    # (añade más si necesitas)
+    ProxyPass        "/admin/"  "http://${BACKEND_HOST}/admin/"
+    ProxyPassReverse "/admin/"  "http://${BACKEND_HOST}/admin/"
 
-    # ❗ IMPORTANTE: excluir backend del fallback
-    # ── Frontend Angular ────────────────────── 
-    <Directory /var/www/frontend> 
-        AllowOverride All 
-        Require all granted 
-        Options -Indexes +FollowSymLinks 
-        # FallbackResource solo para rutas que no sean del backend 
-        FallbackResource /index.html 
+    # -------------------------
+    # FRONTEND (Angular) - Fallback
+    # -------------------------
+    <Directory /var/www/frontend>
+        AllowOverride All
+        Require all granted
+        Options -Indexes +FollowSymLinks
+
+        RewriteEngine On
+
+        # Si la petición empieza por /api o /admin, no tocarla (dejar que Proxy la maneje)
+        RewriteCond %%{REQUEST_URI} ^/(api|admin) [NC]
+        RewriteRule ^ - [L]
+
+        # Si el recurso físico existe, servirlo
+        RewriteCond %%{REQUEST_FILENAME} -f
+        RewriteRule ^ - [L]
+
+        # Si no existe, servir index.html (SPA)
+        RewriteRule ^ /index.html [L]
     </Directory>
+
+    # Opcional: logs específicos para este VirtualHost
+    ErrorLog $${APACHE_LOG_DIR}/techuniverse2_error.log
+    CustomLog $${APACHE_LOG_DIR}/techuniverse2_access.log combined
 
 </VirtualHost>
 </IfModule>
