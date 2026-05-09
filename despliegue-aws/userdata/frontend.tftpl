@@ -116,12 +116,23 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     ProxyPass /livewire http://${BACKEND_HOST}/livewire
     ProxyPassReverse /livewire http://${BACKEND_HOST}/livewire
 
-    # Assets Filament (css/js/fonts/images publicados en public/)
-    ProxyPass /css http://${BACKEND_HOST}/css
-    ProxyPassReverse /css http://${BACKEND_HOST}/css
+    # ── Sanctum (CSRF cookie para SPA) ───────
+    ProxyPass /sanctum http://${BACKEND_HOST}/sanctum
+    ProxyPassReverse /sanctum http://${BACKEND_HOST}/sanctum
 
-    ProxyPass /js http://${BACKEND_HOST}/js
+    # ── Assets Filament ───────────────────────
+    # /js y /css: proxy al backend SOLO si el archivo no existe en el
+    # filesystem local. Así los bundles de Angular (que sí están en disco)
+    # se sirven directamente y no se interceptan.
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(/js/.*)$ http://${BACKEND_HOST}$1 [P,L]
     ProxyPassReverse /js http://${BACKEND_HOST}/js
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(/css/.*)$ http://${BACKEND_HOST}$1 [P,L]
+    ProxyPassReverse /css http://${BACKEND_HOST}/css
 
     ProxyPass /fonts http://${BACKEND_HOST}/fonts
     ProxyPassReverse /fonts http://${BACKEND_HOST}/fonts
@@ -131,6 +142,10 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 
     ProxyPass /storage http://${BACKEND_HOST}/storage
     ProxyPassReverse /storage http://${BACKEND_HOST}/storage
+
+    # Si el backend usa Vite (Filament v3), descomentar:
+    # ProxyPass /build http://${BACKEND_HOST}/build
+    # ProxyPassReverse /build http://${BACKEND_HOST}/build
 
     # ── Frontend Angular ──────────────────────
     <Directory /var/www/frontend>
