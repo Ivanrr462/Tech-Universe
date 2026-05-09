@@ -126,11 +126,11 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     # se sirven directamente y no se interceptan.
     RewriteEngine On
 
-    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %%{REQUEST_FILENAME} !-f
     RewriteRule ^(/js/.*)$ http://${BACKEND_HOST}$1 [P,L]
     ProxyPassReverse /js http://${BACKEND_HOST}/js
 
-    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %%{REQUEST_FILENAME} !-f
     RewriteRule ^(/css/.*)$ http://${BACKEND_HOST}$1 [P,L]
     ProxyPassReverse /css http://${BACKEND_HOST}/css
 
