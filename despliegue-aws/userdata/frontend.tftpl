@@ -86,38 +86,16 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
 
-    # ── API Laravel ──────────────────────────
-    ProxyPass /api http://${BACKEND_HOST}/api
-    ProxyPassReverse /api http://${BACKEND_HOST}/api
-
-    # ── Panel Filament + Livewire ─────────────
-    ProxyPass /admin http://${BACKEND_HOST}/admin
-    ProxyPassReverse /admin http://${BACKEND_HOST}/admin
-
-    ProxyPass /livewire http://${BACKEND_HOST}/livewire
-    ProxyPassReverse /livewire http://${BACKEND_HOST}/livewire
-
-    # Assets Filament (css/js/fonts/images publicados en public/)
-    ProxyPass /css http://${BACKEND_HOST}/css
-    ProxyPassReverse /css http://${BACKEND_HOST}/css
-
-    ProxyPass /js http://${BACKEND_HOST}/js
-    ProxyPassReverse /js http://${BACKEND_HOST}/js
-
-    ProxyPass /fonts http://${BACKEND_HOST}/fonts
-    ProxyPassReverse /fonts http://${BACKEND_HOST}/fonts
-
-    ProxyPass /vendor http://${BACKEND_HOST}/vendor
-    ProxyPassReverse /vendor http://${BACKEND_HOST}/vendor
-
-    ProxyPass /storage http://${BACKEND_HOST}/storage
-    ProxyPassReverse /storage http://${BACKEND_HOST}/storage
+    # ── Backend routes (ANTES del Directory) ──
+    ProxyPassMatch ^/(api|admin|livewire|css|js|fonts|vendor|storage|sanctum)(.*) http://${BACKEND_HOST}/$1$2
+    ProxyPassReverse / http://${BACKEND_HOST}/
 
     # ── Frontend Angular ──────────────────────
     <Directory /var/www/frontend>
         AllowOverride All
         Require all granted
         Options -Indexes +FollowSymLinks
+        # FallbackResource solo para rutas que no sean del backend
         FallbackResource /index.html
     </Directory>
 
