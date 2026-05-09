@@ -11,11 +11,11 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y \
 # =========================
 # APACHE MODULES
 # =========================
-a2enmod rewrite ssl headers proxy proxy_http
+a2enmod rewrite ssl headers proxy proxy_http proxy_wstunnel
 systemctl enable apache2
 
 # =========================
-# DUCKDNS (actualización IP al boot)
+# DUCKDNS
 # =========================
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
 curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
@@ -51,10 +51,9 @@ EOF
 
 a2ensite techuniverse.conf
 a2dissite 000-default.conf
-
 systemctl restart apache2
 
-sleep 10
+sleep 30
 
 # =========================
 # CERTBOT (HTTPS)
@@ -64,12 +63,11 @@ if [ ! -f /etc/letsencrypt/live/techuniverse.duckdns.org/fullchain.pem ]; then
     -d techuniverse.duckdns.org \
     --non-interactive \
     --agree-tos \
-    -m ivan.rios1712@gmail.com \
-    --redirect
+    -m ivan.rios1712@gmail.com
 fi
 
 # =========================
-# VHOST HTTPS FINAL (CORRECTO)
+# VHOST HTTPS FINAL
 # =========================
 cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 <IfModule mod_ssl.c>
@@ -88,10 +86,34 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
 
-    # API BACKEND
+    # ── API Laravel ──────────────────────────
     ProxyPass /api http://${BACKEND_HOST}/api
     ProxyPassReverse /api http://${BACKEND_HOST}/api
 
+    # ── Panel Filament + Livewire ─────────────
+    ProxyPass /admin http://${BACKEND_HOST}/admin
+    ProxyPassReverse /admin http://${BACKEND_HOST}/admin
+
+    ProxyPass /livewire http://${BACKEND_HOST}/livewire
+    ProxyPassReverse /livewire http://${BACKEND_HOST}/livewire
+
+    # Assets Filament (css/js/fonts/images publicados en public/)
+    ProxyPass /css http://${BACKEND_HOST}/css
+    ProxyPassReverse /css http://${BACKEND_HOST}/css
+
+    ProxyPass /js http://${BACKEND_HOST}/js
+    ProxyPassReverse /js http://${BACKEND_HOST}/js
+
+    ProxyPass /fonts http://${BACKEND_HOST}/fonts
+    ProxyPassReverse /fonts http://${BACKEND_HOST}/fonts
+
+    ProxyPass /vendor http://${BACKEND_HOST}/vendor
+    ProxyPassReverse /vendor http://${BACKEND_HOST}/vendor
+
+    ProxyPass /storage http://${BACKEND_HOST}/storage
+    ProxyPassReverse /storage http://${BACKEND_HOST}/storage
+
+    # ── Frontend Angular ──────────────────────
     <Directory /var/www/frontend>
         AllowOverride All
         Require all granted
@@ -104,8 +126,14 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 EOF
 
 a2ensite techuniverse-le-ssl.conf
-
 systemctl reload apache2
+
+# =========================
+# CRON DUCKDNS EN CADA REINICIO
+# =========================
+cat > /etc/cron.d/duckdns << CRON
+@reboot root PUBLIC_IP=\$(curl -s http://checkip.amazonaws.com) && curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=\$PUBLIC_IP"
+CRON
 
 # =========================
 # CODEDEPLOY AGENT
@@ -114,6 +142,5 @@ cd /tmp
 curl -O https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
 chmod +x install
 ./install auto
-
 systemctl enable codedeploy-agent
 systemctl start codedeploy-agent

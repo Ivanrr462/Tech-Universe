@@ -2,26 +2,50 @@
 
 cd /var/www/api
 
-# permisos
-chown -R www-data:www-data /var/www/api
-chmod -R 775 storage bootstrap/cache
+# =========================
+# PERMISOS INICIALES
+# =========================
+chown -R ubuntu:ubuntu /var/www/api
+chmod -R 775 /var/www/api
 
-# env
+# =========================
+# ENV
+# =========================
 if [ ! -f .env ]; then
   cp /var/www/.env.base .env
 fi
 
-# SOLO si php existe (seguridad)
-if command -v php >/dev/null 2>&1; then
+# =========================
+# COMPOSER
+# =========================
+export HOME=/root
+export COMPOSER_HOME=/root/.composer
 
-  php artisan key:generate --force || true
-  php artisan migrate --force --no-interaction
+composer install --no-dev --optimize-autoloader --no-interaction
 
-  php artisan optimize:clear
-  php artisan config:cache
-  php artisan route:cache
-  php artisan view:cache
+# =========================
+# ARTISAN
+# =========================
+php artisan key:generate --force
 
-fi
+php artisan migrate --force --no-interaction
+
+php artisan db:seed --force --no-interaction || true
+
+# Publicar assets de Filament
+php artisan filament:upgrade || true
+php artisan vendor:publish --tag=filament-assets --force || true
+php artisan vendor:publish --tag=livewire:assets --force || true
+
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache || true
+php artisan view:cache
+
+# =========================
+# PERMISOS FINALES
+# =========================
+chown -R www-data:www-data /var/www/api
+chmod -R 775 /var/www/api/storage /var/www/api/bootstrap/cache
 
 systemctl restart apache2 || true

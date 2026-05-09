@@ -5,14 +5,22 @@ exec > /var/log/userdata.log 2>&1
 # BASE
 # =========================
 apt-get update -y
-apt-get install -y apache2 curl unzip wget git snapd
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  apache2 curl unzip wget git snapd ruby-full
 
 # =========================
 # PHP + EXTENSIONES
 # =========================
 apt-get install -y php php-cli php-mysql php-xml \
-php-mbstring php-curl php-zip php-bcmath php-intl \
-libapache2-mod-php
+  php-mbstring php-curl php-zip php-bcmath php-intl \
+  libapache2-mod-php
+
+# =========================
+# COMPOSER
+# =========================
+export HOME=/root
+curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+ln -sf /usr/local/bin/composer /usr/bin/composer
 
 # =========================
 # APACHE MODULES
@@ -21,85 +29,32 @@ a2enmod rewrite ssl headers
 systemctl enable apache2
 
 # =========================
+# VHOST APACHE PARA LARAVEL
+# =========================
+cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
+<VirtualHost *:80>
+    ServerName backend.techuniverse.local
+    DocumentRoot /var/www/api/public
+
+    <Directory /var/www/api/public>
+        AllowOverride All
+        Require all granted
+        Options -Indexes +FollowSymLinks
+    </Directory>
+
+    ErrorLog /var/log/apache2/backend-error.log
+    CustomLog /var/log/apache2/backend-access.log combined
+</VirtualHost>
+EOF
+
+a2ensite techuniverse.conf
+a2dissite 000-default.conf
+
+# =========================
 # APP DIR
 # =========================
 mkdir -p /var/www/api
 chown -R www-data:www-data /var/www/api
-
-# =========================
-# VHOST HTTP (solo para Certbot / redirect)
-# =========================
-cat > /etc/apache2/sites-available/admin.conf << 'EOF'
-<VirtualHost *:80>
-    ServerName admin-techuniverse.duckdns.org
-    DocumentRoot /var/www/api/public
-
-    <Directory /var/www/api/public>
-        AllowOverride All
-        Require all granted
-        Options -Indexes +FollowSymLinks
-    </Directory>
-</VirtualHost>
-EOF
-
-a2ensite admin.conf
-a2dissite 000-default.conf
-
-systemctl reload apache2
-
-# =========================
-# DUCKDNS (solo inicial)
-# =========================
-IP=$(curl -s http://checkip.amazonaws.com)
-curl -s "https://www.duckdns.org/update?domains=admin-techuniverse&token=${DUCKDNS_TOKEN}&ip=$IP"
-
-# =========================
-# CERTBOT
-# =========================
-snap install core
-snap refresh core
-snap install --classic certbot
-ln -sf /snap/bin/certbot /usr/bin/certbot
-
-certbot --apache \
-  -d admin-techuniverse.duckdns.org \
-  --non-interactive \
-  --agree-tos \
-  -m ivan.rios1712@gmail.com \
-  --redirect || true
-
-# =========================
-# FORZAR VHOST HTTPS (ESTABLE Y FIABLE)
-# =========================
-cat > /etc/apache2/sites-available/admin-le-ssl.conf << EOF
-<IfModule mod_ssl.c>
-<VirtualHost *:443>
-
-    ServerName admin-techuniverse.duckdns.org
-
-    DocumentRoot /var/www/api/public
-
-    SSLEngine on
-    SSLCertificateFile /etc/letsencrypt/live/admin-techuniverse.duckdns.org/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/admin-techuniverse.duckdns.org/privkey.pem
-
-    RequestHeader set X-Forwarded-Proto "https"
-    RequestHeader set X-Forwarded-Port "443"
-    RequestHeader set X-Forwarded-Host "admin-techuniverse.duckdns.org"
-
-    <Directory /var/www/api/public>
-        AllowOverride All
-        Require all granted
-        Options -Indexes +FollowSymLinks
-    </Directory>
-
-</VirtualHost>
-</IfModule>
-EOF
-
-a2ensite admin-le-ssl.conf
-a2enmod ssl headers
-systemctl reload apache2
 
 # =========================
 # ENV BASE
@@ -109,8 +64,8 @@ APP_ENV=production
 APP_DEBUG=false
 APP_KEY=
 
-APP_URL=https://admin-techuniverse.duckdns.org
-ASSET_URL=https://admin-techuniverse.duckdns.org
+APP_URL=https://techuniverse.duckdns.org
+ASSET_URL=https://techuniverse.duckdns.org
 
 DB_CONNECTION=mysql
 DB_HOST=${DB_HOST}
@@ -118,24 +73,18 @@ DB_PORT=3306
 DB_DATABASE=techuniverse
 DB_USERNAME=root
 DB_PASSWORD=${DB_ROOT_PASSWORD}
+
+FILAMENT_FILESYSTEM_DISK=public
 EOF
+
+systemctl restart apache2
 
 # =========================
 # CODEDEPLOY AGENT
 # =========================
 cd /tmp
-
 curl -O https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
 chmod +x install
 ./install auto
-
 systemctl enable codedeploy-agent
 systemctl start codedeploy-agent
-
-# =========================
-# PERMISOS
-# =========================
-chown -R www-data:www-data /var/www/api
-chmod -R 775 /var/www/api/storage /var/www/api/bootstrap/cache
-
-systemctl restart apache2

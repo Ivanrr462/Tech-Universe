@@ -121,13 +121,6 @@ resource "aws_vpc_security_group_ingress_rule" "https_frontend" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "https_backend" {
-  security_group_id = aws_security_group.BackEnd.id
-  from_port         = 443
-  to_port           = 443
-  ip_protocol       = "TCP"
-  cidr_ipv4         = "0.0.0.0/0"
-}
 
 // db
 resource "aws_vpc_security_group_ingress_rule" "mysql_db" {
@@ -175,7 +168,6 @@ resource "aws_instance" "BackEnd" {
   user_data = templatefile("userdata/backend.tftpl", {
     DB_HOST          = aws_instance.db.private_ip
     DB_ROOT_PASSWORD = var.db_root_password
-    DUCKDNS_TOKEN    = var.duckdns_token
   })
   user_data_replace_on_change = true
   depends_on                  = [aws_instance.db]
