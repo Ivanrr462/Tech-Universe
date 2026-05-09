@@ -116,15 +116,13 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     # (añade más si necesitas)
 
     # ❗ IMPORTANTE: excluir backend del fallback
-    <Directory /var/www/frontend>
-        AllowOverride All
-        Require all granted
-        Options -Indexes +FollowSymLinks
-
-        RewriteEngine On
-        RewriteCond %{REQUEST_URI} !^/api/
-        RewriteCond %{REQUEST_URI} !^/admin/
-        RewriteRule ^ /index.html [L]
+    # ── Frontend Angular ────────────────────── 
+    <Directory /var/www/frontend> 
+        AllowOverride All 
+        Require all granted 
+        Options -Indexes +FollowSymLinks 
+        # FallbackResource solo para rutas que no sean del backend 
+        FallbackResource /index.html 
     </Directory>
 
 </VirtualHost>
