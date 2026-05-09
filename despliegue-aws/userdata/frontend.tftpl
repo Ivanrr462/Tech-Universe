@@ -107,18 +107,40 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
     RequestHeader set X-Forwarded-For "%%{REMOTE_ADDR}s"
+    RequestHeader set X-Forwarded-Host "%%{HTTP_HOST}s"
 
     # -------------------------
     # BACKEND (rutas explícitas)
     # -------------------------
+    # Asegúrate de pasar BACKEND_HOST como IP:PUERTO si el backend no usa 80
     ProxyPass        "/api/"  "http://${BACKEND_HOST}/api/"
     ProxyPassReverse "/api/"  "http://${BACKEND_HOST}/api/"
 
-    ProxyPass        "/admin"  "http://${BACKEND_HOST}/admin"
-    ProxyPassReverse "/admin"  "http://${BACKEND_HOST}/admin"
-
     ProxyPass        "/admin/"  "http://${BACKEND_HOST}/admin/"
     ProxyPassReverse "/admin/"  "http://${BACKEND_HOST}/admin/"
+
+    # Reescribe Location absolutas que el backend pueda devolver (añade variantes si hace falta)
+    ProxyPassReverse "http://${BACKEND_HOST}/" "https://techuniverse2.duckdns.org/"
+    ProxyPassReverse "http://techuniverse.duckdns.org/" "https://techuniverse2.duckdns.org/"
+
+    # Reescritura de cookies (descomenta y ajusta si ves cookies con dominio/path internos)
+    # ProxyPassReverseCookiePath / /admin
+    # ProxyPassReverseCookieDomain 172.31.47.20 techuniverse2.duckdns.org
+
+    # -------------------------
+    # ASSETS (Filament) - proxy directo al backend
+    # -------------------------
+    ProxyPass        "/css/filament/"   "http://${BACKEND_HOST}/css/filament/"
+    ProxyPassReverse "/css/filament/"   "http://${BACKEND_HOST}/css/filament/"
+
+    ProxyPass        "/js/filament/"    "http://${BACKEND_HOST}/js/filament/"
+    ProxyPassReverse "/js/filament/"    "http://${BACKEND_HOST}/js/filament/"
+
+    ProxyPass        "/fonts/filament/" "http://${BACKEND_HOST}/fonts/filament/"
+    ProxyPassReverse "/fonts/filament/" "http://${BACKEND_HOST}/fonts/filament/"
+
+    ProxyPass        "/vendor/"         "http://${BACKEND_HOST}/vendor/"
+    ProxyPassReverse "/vendor/"         "http://${BACKEND_HOST}/vendor/"
 
     # -------------------------
     # FRONTEND (Angular) - Fallback
@@ -130,8 +152,8 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 
         RewriteEngine On
 
-        # Si la petición empieza por /api o /admin, no tocarla (dejar que Proxy la maneje)
-        RewriteCond %%{REQUEST_URI} ^/(api|admin) [NC]
+        # No tocar rutas de backend ni assets (dejar que Proxy las maneje)
+        RewriteCond %%{REQUEST_URI} ^/(api|admin|css|js|fonts|vendor) [NC]
         RewriteRule ^ - [L]
 
         # Si el recurso físico existe, servirlo
@@ -142,12 +164,13 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
         RewriteRule ^ /index.html [L]
     </Directory>
 
-    # Opcional: logs específicos para este VirtualHost
+    # Logs específicos para este VirtualHost
     ErrorLog $${APACHE_LOG_DIR}/techuniverse2_error.log
     CustomLog $${APACHE_LOG_DIR}/techuniverse2_access.log combined
 
 </VirtualHost>
 </IfModule>
+
 EOF
 
 a2ensite techuniverse-le-ssl.conf
