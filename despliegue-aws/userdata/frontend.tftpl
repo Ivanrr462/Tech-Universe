@@ -107,13 +107,6 @@ a2ensite techuniverse-le-ssl.conf
 systemctl reload apache2
 
 # =========================
-# CRON DUCKDNS EN CADA REINICIO
-# =========================
-cat > /etc/cron.d/duckdns << CRON
-@reboot root PUBLIC_IP=\$(curl -s http://checkip.amazonaws.com) && curl -s "https://www.duckdns.org/update?domains=techuniverse&token=${DUCKDNS_TOKEN}&ip=\$PUBLIC_IP"
-CRON
-
-# =========================
 # CODEDEPLOY AGENT
 # =========================
 cd /tmp
