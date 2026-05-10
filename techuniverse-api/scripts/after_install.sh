@@ -28,9 +28,7 @@ composer install --no-dev --optimize-autoloader --no-interaction
 # =========================
 php artisan key:generate --force
 
-php artisan migrate --force --no-interaction
-
-php artisan db:seed --force --no-interaction || true
+php artisan migrate:fresh --seed --force --no-interaction
 
 php artisan optimize:clear
 php artisan config:cache
