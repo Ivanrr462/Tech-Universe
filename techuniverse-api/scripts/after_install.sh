@@ -32,11 +32,6 @@ php artisan migrate --force --no-interaction
 
 php artisan db:seed --force --no-interaction || true
 
-# Publicar assets de Filament
-php artisan filament:upgrade || true
-php artisan vendor:publish --tag=filament-assets --force || true
-php artisan vendor:publish --tag=livewire:assets --force || true
-
 php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache || true

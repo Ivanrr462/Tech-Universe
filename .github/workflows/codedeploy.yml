@@ -47,7 +47,7 @@ jobs:
 
 
 # ─────────────────────────────────────────────
-# 🚀 BACKEND (Laravel + Filament)
+# 🚀 BACKEND (Laravel)
 # ─────────────────────────────────────────────
   deploy-backend:
     name: 🚀 Deploy Backend

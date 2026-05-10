@@ -105,17 +105,18 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     RequestHeader set X-Forwarded-Proto "https"
     RequestHeader set X-Forwarded-Port "443"
 
-    # Todo lo del backend va al backend ANTES del FallbackResource
-    ProxyPassMatch ^/(api|admin|livewire|sanctum|vendor|storage|fonts)(.*) http://${BACKEND_HOST}/$1$2
-    ProxyPassReverse / http://${BACKEND_HOST}/
+    # Rutas del backend (API + panel admin Blade)
+    ProxyPass /api http://${BACKEND_HOST}/api
+    ProxyPassReverse /api http://${BACKEND_HOST}/api
 
-    # Los assets de Filament (js/css) que NO existen en /var/www/frontend
-    # se proxean al backend
-    RewriteEngine On
-    RewriteCond /var/www/frontend%%{REQUEST_FILENAME} !-f
-    RewriteRule ^/(js|css)/filament/(.*) http://${BACKEND_HOST}/$1/filament/$2 [P,L]
-    ProxyPassReverse /js/filament http://${BACKEND_HOST}/js/filament
-    ProxyPassReverse /css/filament http://${BACKEND_HOST}/css/filament
+    ProxyPass /admin http://${BACKEND_HOST}/admin
+    ProxyPassReverse /admin http://${BACKEND_HOST}/admin
+
+    ProxyPass /sanctum http://${BACKEND_HOST}/sanctum
+    ProxyPassReverse /sanctum http://${BACKEND_HOST}/sanctum
+
+    ProxyPass /storage http://${BACKEND_HOST}/storage
+    ProxyPassReverse /storage http://${BACKEND_HOST}/storage
 
     <Directory /var/www/frontend>
         AllowOverride All
