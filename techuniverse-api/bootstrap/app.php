@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\CheckRol;
+use App\Http\Middleware\IsAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,10 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'rol' => \App\Http\Middleware\CheckRol::class,
-            'is_admin' => \App\Http\Middleware\IsAdmin::class,
+            'rol' => CheckRol::class,
+            'is_admin' => IsAdmin::class,
+            'admin' => AdminMiddleware::class,
         ]);
-        $middleware->redirectGuestsTo('/api/no-autenticado');
+        $middleware->redirectGuestsTo('/admin/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

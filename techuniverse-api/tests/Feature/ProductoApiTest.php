@@ -100,6 +100,8 @@ class ProductoApiTest extends TestCase
 
     public function test_puede_eliminar_un_producto()
     {
+        Storage::fake('r2');
+
         $admin = User::factory()->create(['rol' => 'admin']);
         Sanctum::actingAs($admin, ['*']);
 

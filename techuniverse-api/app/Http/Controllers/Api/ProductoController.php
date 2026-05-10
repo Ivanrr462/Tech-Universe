@@ -107,8 +107,8 @@ class ProductoController extends Controller
         $sortMap = [
             'precio_asc' => ['precio', 'asc'],
             'precio_desc' => ['precio', 'desc'],
-            'novedad_asc' => ['created_at', 'asc'],
-            'novedad_desc' => ['created_at', 'desc'],
+            'novedad_asc' => ['updated_at', 'asc'],
+            'novedad_desc' => ['updated_at', 'desc'],
         ];
 
         $sort = $request->query('sort');
@@ -193,6 +193,57 @@ class ProductoController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/productos/oferta",
+     *     summary="Listar productos en oferta",
+     *     description="Retorna una lista paginada de productos que tienen descuento mayor a 0.",
+     *     tags={"Productos"},
+     *
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Número de página a obtener",
+     *         required=false,
+     *         example=1,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista paginada de productos en oferta obtenida correctamente",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *
+     *                 @OA\Items(ref="#/components/schemas/Producto")
+     *             ),
+     *
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=3),
+     *                 @OA\Property(property="per_page", type="integer", example=12),
+     *                 @OA\Property(property="total", type="integer", example=30)
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function oferta()
+    {
+        $productos = Producto::with('categoria', 'productoEspecificaciones.especificacion')
+            ->where('descuento', '>', 0);
+
+        return ProductoResource::collection($productos->paginate(12));
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/productos",
      *     summary="Crear un nuevo producto",
@@ -244,20 +295,21 @@ class ProductoController extends Controller
     {
         $validated = $request->validate([
             'nombre' => 'required|string|max:255',
-            'precio' => 'required|integer|min:1',
+            'precio' => 'required|numeric|min:0.01',
             'descripcion' => 'nullable|string|max:255',
             'categoria_id' => 'required|integer|min:1',
             'foto' => 'required|image|max:4096',
         ]);
 
-        $path = $request->file('foto')->store('productos', 'r2');
+        $path = $request->file('foto')->storePublicly('productos', 'r2');
+        $fotoUrl = rtrim(config('filesystems.disks.r2.url', env('R2_PUBLIC_URL', '')), '/').'/'.$path;
 
         $producto = Producto::create([
             'nombre' => $validated['nombre'],
             'precio' => $validated['precio'],
             'descripcion' => $validated['descripcion'],
             'categoria_id' => $validated['categoria_id'],
-            'foto' => $path,
+            'foto' => $fotoUrl,
         ]);
 
         return response()->json([
@@ -344,7 +396,7 @@ class ProductoController extends Controller
 
         $validated = $request->validate([
             'nombre' => 'nullable|string|max:255',
-            'precio' => 'nullable|integer|min:1',
+            'precio' => 'nullable|numeric|min:0.01',
             'descripcion' => 'nullable|string|max:255',
             'categoria_id' => 'nullable|integer|min:1',
             'stock' => 'nullable|integer|min:0',
@@ -352,11 +404,11 @@ class ProductoController extends Controller
         ]);
 
         if ($request->hasFile('foto')) {
-            if ($producto->foto) {
+            if ($producto->foto && ! str_starts_with($producto->foto, 'http')) {
                 Storage::disk('r2')->delete($producto->foto);
             }
-            $path = $request->file('foto')->store('productos', 'r2');
-            $validated['foto'] = $path;
+            $path = $request->file('foto')->storePublicly('productos', 'r2');
+            $validated['foto'] = rtrim(config('filesystems.disks.r2.url', env('R2_PUBLIC_URL', '')), '/').'/'.$path;
         }
 
         $producto->update($validated);
@@ -414,7 +466,7 @@ class ProductoController extends Controller
             return response()->json(['error' => 'No encontrado'], 404);
         }
 
-        if ($producto->foto) {
+        if ($producto->foto && ! str_starts_with($producto->foto, 'http')) {
             Storage::disk('r2')->delete($producto->foto);
         }
 

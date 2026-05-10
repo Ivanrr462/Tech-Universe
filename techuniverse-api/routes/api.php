@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\CestaController;
@@ -12,114 +9,69 @@ use App\Http\Controllers\Api\ProductoController;
 use App\Http\Controllers\Api\ProductoEspecifiacionController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\WishlistController;
+use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Usuario autenticado
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// ── Auth ────────────────────────────────────────────────────────────────────
+Route::post('/register', [AuthController::class, 'register'])->name('api.register');
+Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum')->name('api.logout');
+Route::get('/user', [AuthController::class, 'me'])->middleware('auth:sanctum')->name('api.user');
+
+// ── Productos públicos ───────────────────────────────────────────────────────
+Route::get('/productos/count', [ProductoController::class, 'count'])->name('api.productos.count');
+Route::get('/productos/oferta', [ProductoController::class, 'oferta'])->name('api.productos.oferta');
+Route::get('/productos', [ProductoController::class, 'index'])->name('api.productos.index');
+Route::get('/productos/{id}', [ProductoController::class, 'show'])->name('api.productos.show');
+
+// ── Categorías públicas ──────────────────────────────────────────────────────
+Route::get('/categoria/productos', [CategoriaController::class, 'indexProductos'])->name('api.categoria.productos');
+Route::get('/categoria', [CategoriaController::class, 'index'])->name('api.categoria.index');
+Route::get('/categoria/{categoria}', [CategoriaController::class, 'show'])->name('api.categoria.show');
+
+// ── Especificaciones públicas ────────────────────────────────────────────────
+Route::get('/especificacion/productos', [EspecifiacionController::class, 'indexProductos'])->name('api.especificacion.productos');
+Route::get('/especificacion', [EspecifiacionController::class, 'index'])->name('api.especificacion.index');
+Route::get('/especificacion/{id}', [EspecifiacionController::class, 'show'])->name('api.especificacion.show');
+
+// ── Usuario autenticado ──────────────────────────────────────────────────────
+Route::middleware(['auth:sanctum', 'rol:usuario'])->group(function () {
+    Route::get('/deseos/{id}', [WishlistController::class, 'show'])->name('api.deseos.show');
+    Route::post('/deseos', [WishlistController::class, 'store'])->name('api.deseos.store');
+    Route::delete('/deseos/{id}', [WishlistController::class, 'destroy'])->name('api.deseos.destroy');
+
+    Route::get('/cesta', [CestaController::class, 'index'])->name('api.cesta.index');
+
+    Route::post('/cesta/productos', [ProductoCestaController::class, 'store'])->name('api.cesta.productos.store');
+    Route::put('/cesta/productos/{id}', [ProductoCestaController::class, 'update'])->name('api.cesta.productos.update');
+    Route::delete('/cesta/productos/{id}', [ProductoCestaController::class, 'destroy'])->name('api.cesta.productos.destroy');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Auth
-|--------------------------------------------------------------------------
-*/
-Route::post('/register', [AuthController::class, 'register'])->name('api.auth.register');
-Route::post('/login', [AuthController::class, 'login'])->name('api.auth.login');
-Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth:sanctum')
-    ->name('api.auth.logout');
+// ── Admin ────────────────────────────────────────────────────────────────────
+Route::middleware(['auth:sanctum', 'rol:admin'])->group(function () {
+    Route::get('/deseos', [WishlistController::class, 'index'])->name('api.deseos.index');
 
-/*
-|--------------------------------------------------------------------------
-| PÚBLICO
-|--------------------------------------------------------------------------
-*/
-Route::name('api.')->group(function () {
+    // Productos
+    Route::post('/productos', [ProductoController::class, 'store'])->name('api.productos.store');
+    Route::put('/productos/{id}', [ProductoController::class, 'update'])->name('api.productos.update');
+    Route::patch('/productos/{id}', [ProductoController::class, 'update'])->name('api.productos.update.patch');
+    Route::delete('/productos/{id}', [ProductoController::class, 'destroy'])->name('api.productos.destroy');
 
-    Route::get('productos/count', [ProductoController::class, 'count'])->name('productos.count');
-    Route::apiResource('productos', ProductoController::class)->only(['index', 'show']);
+    // Categorías
+    Route::post('/categoria', [CategoriaController::class, 'store'])->name('api.categoria.store');
+    Route::put('/categoria/{categoria}', [CategoriaController::class, 'update'])->name('api.categoria.update');
+    Route::delete('/categoria/{categoria}', [CategoriaController::class, 'destroy'])->name('api.categoria.destroy');
 
-    Route::get('categoria/productos', [CategoriaController::class, 'indexProductos'])->name('categoria.productos');
-    Route::apiResource('categoria', CategoriaController::class)->only(['index', 'show']);
+    // Especificaciones
+    Route::post('/especificacion', [EspecifiacionController::class, 'store'])->name('api.especificacion.store');
+    Route::put('/especificacion/{id}', [EspecifiacionController::class, 'update'])->name('api.especificacion.update');
+    Route::delete('/especificacion/{id}', [EspecifiacionController::class, 'destroy'])->name('api.especificacion.destroy');
 
-    Route::get('especificacion/productos', [EspecifiacionController::class, 'indexProductos'])->name('especificacion.productos');
-    Route::apiResource('especificacion', EspecifiacionController::class)->only(['index', 'show']);
+    Route::post('/especificacion/productos', [ProductoEspecifiacionController::class, 'store'])->name('api.especificacion.productos.store');
+    Route::put('/especificacion/productos/{id}', [ProductoEspecifiacionController::class, 'update'])->name('api.especificacion.productos.update');
+    Route::delete('/especificacion/productos/{id}', [ProductoEspecifiacionController::class, 'destroy'])->name('api.especificacion.productos.destroy');
+
+    // Usuarios
+    Route::apiResource('/usuarios', UserController::class, ['as' => 'api']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| USUARIO
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth:sanctum', 'rol:usuario'])
-    ->name('api.usuario.')
-    ->group(function () {
-
-        Route::apiResource('deseos', WishlistController::class)->only(['show', 'store', 'destroy']);
-        Route::apiResource('cesta', CestaController::class)->only(['index']);
-        Route::apiResource('cesta/productos', ProductoCestaController::class)
-            ->only(['store', 'update', 'destroy']);
-    });
-
-/*
-|--------------------------------------------------------------------------
-| ADMIN (SIN CONFLICTOS)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth:sanctum', 'rol:admin'])
-    ->group(function () {
-
-        Route::apiResource('usuarios', UserController::class)
-            ->names('api.admin.usuarios');
-
-        Route::apiResource('deseos', WishlistController::class)
-            ->only(['index'])
-            ->names([
-                'index' => 'api.admin.deseos.index',
-            ]);
-
-        Route::apiResource('productos', ProductoController::class)
-            ->except(['index', 'show'])
-            ->names([
-                'store' => 'api.admin.productos.store',
-                'update' => 'api.admin.productos.update',
-                'destroy' => 'api.admin.productos.destroy',
-            ]);
-
-        Route::apiResource('categoria', CategoriaController::class)
-            ->except(['index', 'show'])
-            ->names([
-                'store' => 'api.admin.categoria.store',
-                'update' => 'api.admin.categoria.update',
-                'destroy' => 'api.admin.categoria.destroy',
-            ]);
-
-        Route::apiResource('especificacion', EspecifiacionController::class)
-            ->except(['index', 'show'])
-            ->names([
-                'store' => 'api.admin.especificacion.store',
-                'update' => 'api.admin.especificacion.update',
-                'destroy' => 'api.admin.especificacion.destroy',
-            ]);
-
-        Route::apiResource('especificacion/productos', ProductoEspecifiacionController::class)
-            ->only(['store', 'update', 'destroy'])
-            ->names([
-                'store' => 'api.admin.especificacion.productos.store',
-                'update' => 'api.admin.especificacion.productos.update',
-                'destroy' => 'api.admin.especificacion.productos.destroy',
-            ]);
-    });
-
-/*
-|--------------------------------------------------------------------------
-| No autenticado
-|--------------------------------------------------------------------------
-*/
-Route::get('/no-autenticado', function () {
-    return response()->json(['mensaje' => 'No autenticado'], 401);
-});
+Route::get('/no-autenticado', [AuthController::class, 'noAutenticado'])->name('api.no-autenticado');

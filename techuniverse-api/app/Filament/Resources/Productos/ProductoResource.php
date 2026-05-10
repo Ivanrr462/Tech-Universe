@@ -46,9 +46,34 @@ class ProductoResource extends Resource
                     ->required(),
 
                 TextInput::make('precio')
-                    ->label('Precio')
+                    ->label('Precio (€)')
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    ->reactive(),
+
+                TextInput::make('descuento')
+                    ->label('Descuento (%)')
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(100)
+                    ->default(0)
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        $precio = $get('precio') ?? 0;
+                        $descuento = $state ?? 0;
+
+                        $precioFinal = $descuento > 0
+                            ? round($precio - ($precio * ($descuento / 100)), 2)
+                            : $precio;
+
+                        $set('precioDescuentoPreview', $precioFinal);
+                    })
+                    ->helperText('Porcentaje de descuento aplicado al precio'),
+
+                TextInput::make('precioDescuentoPreview')
+                    ->label('Precio final con descuento (€)')
+                    ->disabled()
+                    ->dehydrated(false),
 
                 TextInput::make('stock')
                     ->label('Stock')
@@ -83,11 +108,10 @@ class ProductoResource extends Resource
                     ->disk('r2')
                     ->directory('productos')
                     ->image()
-                    ->required()
                     ->visibility('public')
                     ->maxSize(4096)
                     ->columnSpanFull()
-                    ->storeFiles(false),
+                    ->storeFiles(true),
             ]);
     }
 
@@ -101,8 +125,7 @@ class ProductoResource extends Resource
                     ->getStateUsing(
                         fn (Producto $record): string => $record->foto
                             ?? 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/dvEcf0VxtjxaHq3yAHBw9uQr4CW4keFw3GFAUvqa.jpg'
-                    )
-                    ->disk(null),
+                    ),
 
                 TextColumn::make('nombre')
                     ->label('Nombre')
@@ -110,7 +133,11 @@ class ProductoResource extends Resource
                     ->sortable(),
 
                 TextColumn::make('precio')
-                    ->label('Precio')
+                    ->label('Precio (€)')
+                    ->sortable(),
+
+                TextColumn::make('descuento')
+                    ->label('Descuento (%)')
                     ->sortable(),
 
                 TextColumn::make('stock')
