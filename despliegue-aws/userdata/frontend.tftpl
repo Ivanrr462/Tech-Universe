@@ -18,7 +18,11 @@ systemctl enable apache2
 # DUCKDNS
 # =========================
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
-curl -s "https://www.duckdns.org/update?domains=techuniverse4&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP"
+DUCKDNS_RESP=$(curl -s "https://www.duckdns.org/update?domains=techuniverse4&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP")
+echo "DuckDNS response: $DUCKDNS_RESP (IP: $PUBLIC_IP)"
+if [ "$DUCKDNS_RESP" != "OK" ]; then
+  echo "⚠️  DuckDNS no devolvió OK — el subdominio puede no estar registrado en la cuenta"
+fi
 
 # =========================
 # CERTBOT
@@ -130,8 +134,14 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 
 EOF
 
-a2ensite techuniverse-le-ssl.conf
-systemctl reload apache2
+# Solo activar el vhost HTTPS si el certificado existe
+if [ -f "/etc/letsencrypt/live/techuniverse4.duckdns.org/fullchain.pem" ]; then
+  a2ensite techuniverse-le-ssl.conf
+  systemctl reload apache2
+  echo "✅ VHost HTTPS activado"
+else
+  echo "❌ Certificado no encontrado — vhost HTTPS NO activado, Apache sigue en HTTP"
+fi
 
 # =========================
 # CODEDEPLOY AGENTE
