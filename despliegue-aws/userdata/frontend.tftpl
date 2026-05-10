@@ -122,11 +122,18 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
     ProxyPass /storage http://${BACKEND_HOST}/storage
     ProxyPassReverse /storage http://${BACKEND_HOST}/storage
 
+    RewriteEngine On
+    RewriteCond %%{REQUEST_URI} !^/api
+    RewriteCond %%{REQUEST_URI} !^/admin
+    RewriteCond %%{REQUEST_URI} !^/sanctum
+    RewriteCond %%{REQUEST_URI} !^/storage
+    RewriteCond %%{DOCUMENT_ROOT}%%{REQUEST_FILENAME} !-f
+    RewriteRule ^ /index.html [L]
+
     <Directory /var/www/frontend>
         AllowOverride All
         Require all granted
         Options -Indexes +FollowSymLinks
-        FallbackResource /index.html
     </Directory>
 
 </VirtualHost>
