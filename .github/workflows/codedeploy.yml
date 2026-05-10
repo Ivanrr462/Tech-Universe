@@ -42,8 +42,7 @@ jobs:
 
       - run: terraform init
       - run: terraform validate
-      - run: terraform destroy -auto-approve
-      - run: terraform plan -out=tfplan
+      - run: terraform plan -replace=aws_instance.BackEnd -replace=aws_instance.FrontEnd -out=tfplan
       - run: terraform apply -auto-approve tfplan
 
 
@@ -74,8 +73,20 @@ jobs:
             --output text)
           echo "BackEnd instance ID: $INSTANCE_ID"
           aws ec2 wait instance-status-ok --instance-ids $INSTANCE_ID
-          echo "✅ EC2 status OK — esperando 3 min para que el userdata termine..."
-          sleep 180
+          echo "✅ EC2 status OK — esperando a que el agente CodeDeploy arranque..."
+          for i in $(seq 1 20); do
+            AGENT=$(aws deploy list-on-premises-instances 2>/dev/null || true)
+            REGISTERED=$(aws ssm describe-instance-information \
+              --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
+              --query "InstanceInformationList[0].InstanceId" \
+              --output text 2>/dev/null || echo "")
+            if [ "$REGISTERED" = "$INSTANCE_ID" ]; then
+              echo "✅ Instancia lista (intento $i)"
+              break
+            fi
+            echo "⏳ Intento $i/20 — esperando 15s..."
+            sleep 15
+          done
 
       # =========================
       # COMPOSER BUILD (AQUÍ)
