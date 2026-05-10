@@ -42,6 +42,7 @@ jobs:
 
       - run: terraform init
       - run: terraform validate
+      - run: terraform destroy -auto-approve
       - run: terraform plan -out=tfplan
       - run: terraform apply -auto-approve tfplan
 
