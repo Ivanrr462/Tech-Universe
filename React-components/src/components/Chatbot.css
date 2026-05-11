@@ -227,6 +227,8 @@
     font-size: 1em;
     outline: none;
     transition: border-color 0.3s;
+    color: #333;
+    background: white;
 }
 
 .input-container input:focus {
@@ -271,5 +273,51 @@
     margin-bottom: 15px;
     font-size: 0.9em;
     animation: slideIn 0.3s ease;
+}
+
+/* Dark mode */
+html.dark .chat-container {
+    background: #1e1e2e;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+html.dark .messages-container {
+    background: #16161e;
+}
+
+html.dark .message.assistant .message-bubble {
+    background: #2a2a3e;
+    color: #e0e0f0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+html.dark .typing-indicator {
+    background: #2a2a3e;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+html.dark .input-container {
+    background: #1e1e2e;
+    border-top-color: #2a2a3e;
+}
+
+html.dark .input-container input {
+    background: #2a2a3e;
+    border-color: #3a3a5e;
+    color: #e0e0f0;
+}
+
+html.dark .input-container input::placeholder {
+    color: #7070a0;
+}
+
+html.dark .input-container input:disabled {
+    background: #16161e;
+    color: #5a5a7a;
+}
+
+html.dark .error-message {
+    background: #3a1a1a;
+    color: #ff7070;
 }
 
