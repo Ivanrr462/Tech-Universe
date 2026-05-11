@@ -43,6 +43,7 @@
         </div>
         <!-- User/Auth Button -->
         @if (authService.currentUser$ | async; as user) {
+          
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium hidden md:inline-block">Hola, {{ user.name.split(' ')[0] }}</span>
           <button (click)="authService.logout()"
