@@ -20,13 +20,16 @@ class CestaResource extends JsonResource
                 return [
                     'id' => $producto->id,
                     'nombre' => $producto->nombre,
+                    'foto' => $producto->foto,
                     'precio_unitario' => $producto->pivot->precio_unitario,
+                    'descuento' => $producto->descuento,
+                    'precioDescuento' => $producto->precioDescuento,
                     'cantidad' => $producto->pivot->cantidad,
-                    'subtotal' => $producto->pivot->precio_unitario * $producto->pivot->cantidad,
+                    'subtotal' => $producto->pivot->precioDescuento * $producto->pivot->cantidad,
                 ];
             }),
             'precio_total' => $this->productosIngresados->sum(function ($producto) {
-                return $producto->pivot->precio_unitario * $producto->pivot->cantidad;
+                return $producto->pivot->precioDescuento * $producto->pivot->cantidad;
             }),
             'cantidad_total' => $this->productosIngresados->sum(function ($producto) {
                 return $producto->pivot->cantidad;

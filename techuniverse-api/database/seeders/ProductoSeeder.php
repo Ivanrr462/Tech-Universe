@@ -13,11 +13,11 @@ class ProductoSeeder extends Seeder
     public function run(): void
     {
         // Smartphones (30)
-        Producto::create(['nombre' => 'iPhone 15 Pro Max', 'precio' => 1299.99, 'descuento' => 15, 'stock' => 25, 'descripcion' => 'Smartphone de última generación con A17 Pro chip', 'categoria_id' => 1, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/VyxmkO4Al4iRsZfxfYDpLOuf2QlIMvjABYNyKikQ.jpg']);
+        Producto::create(['nombre' => 'iPhone 15 Pro Max', 'precio' => 1299.99, 'descuento' => 15, 'stock' => 25, 'descripcion' => 'Smartphone de última generación con A17 Pro chip', 'categoria_id' => 1, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/JhoGaLnIwpUwMrVa4OoJbiduXa4HVPrPk91lSePP.jpg']);
         Producto::create(['nombre' => 'Samsung Galaxy S24 Ultra', 'precio' => 1199.99, 'stock' => 30, 'descripcion' => 'Flagship Samsung con AI y cámara 200MP', 'categoria_id' => 1, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/01KQZ4W9EZN0PG9V4Y61QH4JVM.jpg']);
-        Producto::create(['nombre' => 'Google Pixel 8 Pro', 'precio' => 999.99, 'stock' => 20, 'descripcion' => 'Smartphone Google con procesamiento de AI', 'categoria_id' => 1, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/aO6qk6TQ2YK4sLPk5QRXph6AQzrsGJVIEcHykiO3.jpg']);
+        Producto::create(['nombre' => 'Google Pixel 8 Pro', 'precio' => 999.99, 'stock' => 20, 'descripcion' => 'Smartphone Google con procesamiento de AI', 'categoria_id' => 1, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/ToEDyzOEUKesuLvpmeBxNpHu1uJ07PVueKA7cmvv.jpg']);
         Producto::create(['nombre' => 'OnePlus 12', 'precio' => 899.99, 'stock' => 15, 'descripcion' => 'Smartphone con carga rápida 100W', 'categoria_id' => 1]);
-        Producto::create(['nombre' => 'Xiaomi 14 Ultra', 'precio' => 799.99, 'descuento' => 10, 'stock' => 22, 'descripcion' => 'Smartphone con sensor Leica 1 pulgada', 'categoria_id' => 1]);
+        Producto::create(['nombre' => 'Xiaomi 14 Ultra', 'precio' => 799.99, 'descuento' => 10, 'stock' => 22, 'descripcion' => 'Smartphone con sensor Leica 1 pulgada', 'categoria_id' => 1, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/WTrmiLrazP76Yr84hQ0REPEDkFg9tUHt8LmJmYkn.jpg']);
         Producto::create(['nombre' => 'iPhone 15', 'precio' => 999.99, 'stock' => 28, 'descripcion' => 'iPhone con Dynamic Island y USB-C', 'categoria_id' => 1]);
         Producto::create(['nombre' => 'Samsung Galaxy A54', 'precio' => 499.99, 'stock' => 35, 'descripcion' => 'Smartphone de rango medio Samsung', 'categoria_id' => 1]);
         Producto::create(['nombre' => 'Poco F5 Pro', 'precio' => 599.99, 'stock' => 18, 'descripcion' => 'Smartphone gaming con Snapdragon 8 Gen 2', 'categoria_id' => 1]);
@@ -45,10 +45,10 @@ class ProductoSeeder extends Seeder
         Producto::create(['nombre' => 'Samsung Galaxy S23', 'precio' => 799.99, 'stock' => 20, 'descripcion' => 'Samsung flagship anterior', 'categoria_id' => 1]);
 
         // Portátiles (30)
-        Producto::create(['nombre' => 'MacBook Pro 16" M3 Max', 'precio' => 3499.99, 'descuento' => 12, 'stock' => 12, 'descripcion' => 'MacBook Pro con chip M3 Max', 'categoria_id' => 2]);
-        Producto::create(['nombre' => 'Dell XPS 15 Plus', 'precio' => 2199.99, 'stock' => 15, 'descripcion' => 'Dell XPS con Intel Core i9', 'categoria_id' => 2]);
-        Producto::create(['nombre' => 'HP Spectre x360 16', 'precio' => 2099.99, 'stock' => 14, 'descripcion' => 'HP convertible 2 en 1', 'categoria_id' => 2]);
-        Producto::create(['nombre' => 'Lenovo ThinkPad X1 Carbon', 'precio' => 1799.99, 'stock' => 18, 'descripcion' => 'Lenovo business laptop', 'categoria_id' => 2]);
+        Producto::create(['nombre' => 'MacBook Pro 16" M3 Max', 'precio' => 3499.99, 'descuento' => 12, 'stock' => 12, 'descripcion' => 'MacBook Pro con chip M3 Max', 'categoria_id' => 2, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/Sh0GWPVUVnMGRLBYfsse4FrusbUdVNVS5L96b0h5.jpg']);
+        Producto::create(['nombre' => 'Dell XPS 15 Plus', 'precio' => 2199.99, 'stock' => 15, 'descripcion' => 'Dell XPS con Intel Core i9', 'categoria_id' => 2, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/eE6F84yNDiS2ggpKW4hScqu5BVAobe3kcthjq8t3.jpg']);
+        Producto::create(['nombre' => 'HP Spectre x360 16', 'precio' => 2099.99, 'stock' => 14, 'descripcion' => 'HP convertible 2 en 1', 'categoria_id' => 2, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/MW6IZCmnGOnTthmu5M8i3VZWBjq9UEaEzn2JwQpw.jpg']);
+        Producto::create(['nombre' => 'Lenovo ThinkPad X1 Carbon', 'precio' => 1799.99, 'stock' => 18, 'descripcion' => 'Lenovo business laptop', 'categoria_id' => 2, 'foto' => 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/Cq0mgIOaS5pk0g7jSMTY3aLYIDfW7ZTjKJiRG7j4.jpg']);
         Producto::create(['nombre' => 'ASUS ROG Zephyrus G16', 'precio' => 2499.99, 'stock' => 10, 'descripcion' => 'ASUS gaming con RTX 4090', 'categoria_id' => 2]);
         Producto::create(['nombre' => 'MacBook Air M2 13"', 'precio' => 1699.99, 'stock' => 20, 'descripcion' => 'MacBook Air ultradelgada', 'categoria_id' => 2]);
         Producto::create(['nombre' => 'Dell Inspiron 15 Plus', 'precio' => 899.99, 'stock' => 25, 'descripcion' => 'Dell asequible 15 pulgadas', 'categoria_id' => 2]);
