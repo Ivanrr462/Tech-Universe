@@ -68,8 +68,17 @@ APP_ENV=production
 APP_DEBUG=false
 APP_KEY=
 
-APP_URL=https://techuniverse6.duckdns.org
-ASSET_URL=https://techuniverse6.duckdns.org
+APP_URL=https://techuniverse.duckdns.org
+ASSET_URL=https://techuniverse.duckdns.org
+
+FILESYSTEM_DISK=r2
+
+R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+R2_BUCKET=mi-tienda
+R2_ENDPOINT=https://40bf3d98e2ec105ec6fae1f247b93770.r2.cloudflarestorage.com
+R2_PUBLIC_URL=https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev
+R2_REGION=auto
 
 DB_CONNECTION=mysql
 DB_HOST=${DB_HOST}

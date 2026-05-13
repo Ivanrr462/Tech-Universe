@@ -17,19 +17,30 @@ class CestaResource extends JsonResource
                 'email' => $this->user->email,
             ],
             'productos' => $this->productosIngresados->map(function ($producto) {
+                $precio = $producto->pivot->precio_unitario;
+                $descuento = $producto->descuento ?? 0;
+                $precioDescuento = $descuento > 0
+                    ? round($precio - ($precio * ($descuento / 100)), 2)
+                    : $precio;
+
                 return [
                     'id' => $producto->id,
                     'nombre' => $producto->nombre,
-                    'foto' => $producto->foto,
-                    'precio_unitario' => $producto->pivot->precio_unitario,
-                    'descuento' => $producto->descuento,
-                    'precioDescuento' => $producto->precioDescuento,
+                    'foto' => $producto->foto_url,
+                    'precio_unitario' => $precio,
+                    'descuento' => $descuento,
+                    'precioDescuento' => $precioDescuento,
                     'cantidad' => $producto->pivot->cantidad,
-                    'subtotal' => $producto->pivot->precioDescuento * $producto->pivot->cantidad,
+                    'subtotal' => $precioDescuento * $producto->pivot->cantidad,
                 ];
             }),
             'precio_total' => $this->productosIngresados->sum(function ($producto) {
-                return $producto->pivot->precioDescuento * $producto->pivot->cantidad;
+                $precio = $producto->pivot->precio_unitario;
+                $descuento = $producto->descuento ?? 0;
+
+                return ($descuento > 0
+                    ? round($precio - ($precio * ($descuento / 100)), 2)
+                    : $precio) * $producto->pivot->cantidad;
             }),
             'cantidad_total' => $this->productosIngresados->sum(function ($producto) {
                 return $producto->pivot->cantidad;

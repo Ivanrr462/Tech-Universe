@@ -84,8 +84,6 @@
                             <p class="text-xs font-medium text-slate-500">Foto actual</p>
                             <img src="{{ $producto->foto_url }}" alt="{{ $producto->nombre }}"
                                  class="h-40 w-40 object-cover rounded-lg border border-slate-200 shadow-sm">
-                            <p class="text-xs text-slate-400 break-all">DB: {{ $producto->foto }}</p>
-                            <p class="text-xs text-slate-400 break-all">URL: <a href="{{ $producto->foto_url }}" target="_blank" class="underline text-indigo-500">{{ $producto->foto_url }}</a></p>
                         </div>
                     @else
                         <p class="mb-3 text-xs text-slate-400 italic">Este producto no tiene foto.</p>

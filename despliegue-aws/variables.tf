@@ -27,6 +27,16 @@ variable "duckdns_token" {
   sensitive   = true
 }
 
+variable "r2_access_key_id" {
+  type        = string
+  sensitive   = true
+}
+
+variable "r2_secret_access_key" {
+  type        = string
+  sensitive   = true
+}
+
 data "aws_vpc" "default_vpc" {
   default = true
 }

@@ -168,6 +168,8 @@ resource "aws_instance" "BackEnd" {
   user_data = templatefile("userdata/backend.tftpl", {
     DB_HOST          = aws_instance.db.private_ip
     DB_ROOT_PASSWORD = var.db_root_password
+    R2_ACCESS_KEY_ID = var.r2_access_key_id
+    R2_SECRET_ACCESS_KEY = var.r2_secret_access_key
   })
   user_data_replace_on_change = true
   depends_on                  = [aws_instance.db]
