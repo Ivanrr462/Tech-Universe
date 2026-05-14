@@ -2,7 +2,7 @@ name: Despliegue del código
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
     paths:
       - "techuniverse-api/**"
       - "Angular-frontend/**"
