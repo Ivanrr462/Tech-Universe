@@ -1,13 +1,57 @@
 #!/bin/bash
-chown -R ubuntu:ubuntu /var/www/api
+set -e
+
+# =========================
+# PHP (por si el userdata no lo instaló)
+# =========================
+if ! command -v php &>/dev/null; then
+  apt-get update -y
+  DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    php8.3 php8.3-cli php8.3-mysql php8.3-xml \
+    php8.3-mbstring php8.3-curl php8.3-zip php8.3-bcmath php8.3-intl \
+    libapache2-mod-php8.3
+  update-alternatives --set php /usr/bin/php8.3 2>/dev/null || true
+fi
+
 cd /var/www/api
-composer install --no-dev --optimize-autoloader
-cp /var/www/.env.base .env
+
+# =========================
+# PERMISOS INICIALES
+# =========================
+chown -R ubuntu:ubuntu /var/www/api
+chmod -R 775 /var/www/api
+
+# =========================
+# ENV
+# =========================
+if [ ! -f .env ]; then
+  cp /var/www/.env.base .env
+fi
+
+# =========================
+# COMPOSER
+# =========================
+export HOME=/root
+export COMPOSER_HOME=/root/.composer
+
+composer install --no-dev --optimize-autoloader --no-interaction
+
+# =========================
+# ARTISAN
+# =========================
 php artisan key:generate --force
-php artisan migrate --force
-php artisan db:seed --force
+
+php artisan migrate:fresh --seed --force --no-interaction
+
+php artisan optimize:clear
 php artisan config:cache
-php artisan route:cache
+php artisan route:cache || true
+php artisan view:cache
+
+# =========================
+# PERMISOS FINALES
+# =========================
 chown -R www-data:www-data /var/www/api
-chmod -R 775 /var/www/api/storage
-chmod -R 775 /var/www/api/bootstrap/cache
+chmod -R 775 /var/www/api/storage /var/www/api/bootstrap/cache
+
+systemctl restart apache2 || true

@@ -8,8 +8,8 @@
         </span>
       }
       @if (discount) {
-        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold gradient-primary text-white">
-          {{ discount }}% OFF
+        <span class="inline-flex items-center rounded-md px-2.5 py-1 text-sm font-black gradient-primary text-white shadow-lg tracking-wide">
+          -{{ discount }}% OFF
         </span>
       }
     </div>
@@ -19,10 +19,11 @@
   <button
     (click)="toggleWishlist($event)"
     class="absolute top-2 right-2 z-10 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 w-9 opacity-0 group-hover:opacity-100 transition-opacity"
+    [class.opacity-100]="inWishlist"
     [class.text-red-500]="inWishlist"
     [attr.title]="inWishlist ? 'Quitar de favoritos' : 'Añadir a favoritos'"
   >
-    <lucide-icon [img]="HeartIcon" class="h-4 w-4" [class.fill-current]="inWishlist"></lucide-icon>
+    <lucide-icon [img]="HeartIcon" class="h-4 w-4" [class.heart-filled]="inWishlist"></lucide-icon>
   </button>
 
   <!-- Product Image -->

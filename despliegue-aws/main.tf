@@ -112,6 +112,16 @@ resource "aws_vpc_security_group_ingress_rule" "http_BackEnd" {
   referenced_security_group_id = aws_security_group.FrontEnd.id
 }
 
+// HTTPS
+resource "aws_vpc_security_group_ingress_rule" "https_frontend" {
+  security_group_id = aws_security_group.FrontEnd.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "TCP"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+
 // db
 resource "aws_vpc_security_group_ingress_rule" "mysql_db" {
   security_group_id            = aws_security_group.db.id
@@ -133,13 +143,14 @@ resource "aws_instance" "Bastion" {
 }
 
 resource "aws_instance" "FrontEnd" {
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = var.Instance_Type
-  iam_instance_profile        = var.Instance_Profile
-  key_name                    = var.key_name
-  vpc_security_group_ids      = [aws_security_group.all.id, aws_security_group.FrontEnd.id]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.Instance_Type
+  iam_instance_profile   = var.Instance_Profile
+  key_name               = var.key_name
+  vpc_security_group_ids = [aws_security_group.all.id, aws_security_group.FrontEnd.id]
   user_data = templatefile("userdata/frontend.tftpl", {
-    BACKEND_HOST = aws_instance.BackEnd.private_ip
+    BACKEND_HOST  = aws_instance.BackEnd.private_ip
+    DUCKDNS_TOKEN = var.duckdns_token
   })
   user_data_replace_on_change = true
   depends_on                  = [aws_instance.BackEnd]
@@ -157,6 +168,8 @@ resource "aws_instance" "BackEnd" {
   user_data = templatefile("userdata/backend.tftpl", {
     DB_HOST          = aws_instance.db.private_ip
     DB_ROOT_PASSWORD = var.db_root_password
+    R2_ACCESS_KEY_ID = var.r2_access_key_id
+    R2_SECRET_ACCESS_KEY = var.r2_secret_access_key
   })
   user_data_replace_on_change = true
   depends_on                  = [aws_instance.db]
@@ -179,10 +192,9 @@ resource "aws_instance" "db" {
   }
 }
 
-// IP Elástica
+// IP Elásticaa
 //resource "aws_eip" "ipelastica" {
-// Por ahora lo asocio a la instancia del backend ya que es mejor tenerla con una ip fija
-//  instance = aws_instance.BackEnd.id
+//  instance = aws_instance.Bastion.id
 //  domain = "vpc"
 //  tags = {
 //    Name = "ip elastica"
@@ -222,5 +234,5 @@ resource "aws_route53_record" "backend_record" {
   name    = "backend.${var.domain}"
   zone_id = aws_route53_zone.default.zone_id
   ttl     = 3600
-  records = [aws_instance.BackEnd.public_ip]
+  records = [aws_instance.BackEnd.private_ip]
 }

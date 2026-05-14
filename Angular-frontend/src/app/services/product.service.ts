@@ -30,17 +30,22 @@ export class ProductService {
       });
     }
 
+    const discountRaw = apiProduct.descuento ?? apiProduct.discount;
+    const discount = discountRaw ? Math.round(discountRaw) : undefined;
+    const hasDiscount = !!apiProduct.precioDescuento;
+
     return {
       id: (apiProduct.id ?? apiProduct.producto_id)?.toString() ?? '',
       name: apiProduct.nombre ?? '',
-      price: apiProduct.precio ?? 0,
+      price: hasDiscount ? apiProduct.precioDescuento : (apiProduct.precio ?? 0),
+      originalPrice: hasDiscount ? apiProduct.precio : undefined,
       image: apiProduct.foto ?? '',
       category: apiProduct.categoria?.nombre ?? 'General',
       description: apiProduct.descripcion ?? '',
       specs,
       stock: apiProduct.stock ?? 0,
       isNew: apiProduct.isNew || undefined,
-      discount: apiProduct.discount || undefined,
+      discount,
     };
   }
 
@@ -84,11 +89,15 @@ export class ProductService {
     );
   }
 
-  getFeaturedProducts(): Observable<Product[]> {
-    return this.getProducts(1).pipe(map(r => r.products.filter(p => p.isNew)));
+  getNewProducts(limit = 5): Observable<Product[]> {
+    return this.http.get<any>(`${this.apiUrl}?sort=novedad_asc`).pipe(
+      map(response => (response.data || []).map((p: any) => this.mapApiToProduct(p)).slice(0, limit))
+    );
   }
 
-  getDiscountProducts(): Observable<Product[]> {
-    return this.getProducts(1).pipe(map(r => r.products.filter(p => p.discount)));
+  getOfferProducts(): Observable<Product[]> {
+    return this.http.get<any>(`${this.apiUrl}/oferta`).pipe(
+      map(response => (response.data || []).map((p: any) => this.mapApiToProduct(p)))
+    );
   }
 }

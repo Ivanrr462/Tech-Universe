@@ -15,8 +15,8 @@ import { LucideAngularModule, Truck, Shield, Clock, ArrowRight } from 'lucide-an
 export class Home {
     private productService = inject(ProductService);
 
-    featuredProducts$ = this.productService.getFeaturedProducts();
-    discountProducts$ = this.productService.getDiscountProducts();
+    featuredProducts$ = this.productService.getNewProducts(5);
+    discountProducts$ = this.productService.getOfferProducts();
 
     // Icon references
     readonly TruckIcon = Truck;

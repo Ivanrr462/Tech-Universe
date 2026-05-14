@@ -32,15 +32,22 @@ export class WishlistService {
   loadWishlist(userId: number): void {
     this.http.get<any>(`/api/deseos/${userId}`).subscribe({
       next: (response) => {
-        const data: any[] = response.desea ?? [];
+
+        const data: any[] = response.data?.desea ?? [];
         this.itemsSignal.set(
-          data.map((entry: any) => ({
-            productId: entry.id?.toString(),
-            name: entry.nombre,
-            price: entry.precio,
-            image: entry.foto,
-            category: entry.categoria?.nombre || 'General',
-          }))
+          data.map((entry: any) => {
+            const discount = entry.descuento ? Math.round(parseFloat(entry.descuento)) : undefined;
+            const hasDiscount = !!discount;
+            return {
+              productId: entry.id?.toString(),
+              name: entry.nombre,
+              price: hasDiscount ? entry.precioDescuento : parseFloat(entry.precio),
+              originalPrice: hasDiscount ? parseFloat(entry.precio) : undefined,
+              image: entry.foto,
+              category: entry.categoria?.nombre || 'General',
+              discount,
+            };
+          })
         );
       },
       error: () => {}

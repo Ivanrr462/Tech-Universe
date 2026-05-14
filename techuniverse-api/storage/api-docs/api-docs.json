@@ -3,7 +3,7 @@
     "info": {
         "title": "API TechUniverse",
         "description": "Documentacion de la API TechUniverse",
-        "version": "1.0.0"
+        "version": "1.1.0"
     },
     "servers": [
         {
@@ -1639,6 +1639,69 @@
                                         "total": {
                                             "type": "integer",
                                             "example": 60
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/productos/oferta": {
+            "get": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Listar productos en oferta",
+                "description": "Retorna una lista paginada de productos que tienen descuento mayor a 0.",
+                "operationId": "208bb2d3399d89f4e05ab735640fb5e2",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página a obtener",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de productos en oferta obtenida correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Producto"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 30
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"

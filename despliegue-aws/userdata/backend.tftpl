@@ -1,27 +1,43 @@
 #!/bin/bash
-apt-get update -y
-apt-get install -y software-properties-common curl git unzip ruby-full wget
+exec > /var/log/userdata.log 2>&1
 
-# PHP 8.3 (incluido en Ubuntu 24.04)
-apt-get install -y php8.3 php8.3-cli php8.3-mysql php8.3-xml \
+# =========================
+# BASE
+# =========================
+apt-get update -y
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  apache2 curl unzip wget git snapd ruby-full
+
+# =========================
+# PHP + EXTENSIONES
+# =========================
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  php8.3 php8.3-cli php8.3-mysql php8.3-xml \
   php8.3-mbstring php8.3-curl php8.3-zip php8.3-bcmath php8.3-intl \
   libapache2-mod-php8.3
 
-# Apache
-apt-get install -y apache2
+# Asegurar que el binario php apunta a 8.3
+update-alternatives --set php /usr/bin/php8.3 2>/dev/null || true
 
-# Habilitar módulos necesarios para Laravel
-a2enmod rewrite
-a2enmod php8.3
-
-# Composer
+# =========================
+# COMPOSER
+# =========================
+export HOME=/root
 curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 ln -sf /usr/local/bin/composer /usr/bin/composer
 
-# VirtualHost de Apache para Laravel
+# =========================
+# APACHE MODULES
+# =========================
+a2enmod rewrite ssl headers
+systemctl enable apache2
+
+# =========================
+# VHOST APACHE PARA LARAVEL
+# =========================
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
-    ServerName backend.techuniverse.com
+    ServerName backend.techuniverse.local
     DocumentRoot /var/www/api/public
 
     <Directory /var/www/api/public>
@@ -30,42 +46,57 @@ cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
         Options -Indexes +FollowSymLinks
     </Directory>
 
-    ErrorLog $${APACHE_LOG_DIR}/techuniverse-error.log
-    CustomLog $${APACHE_LOG_DIR}/techuniverse-access.log combined
+    ErrorLog /var/log/apache2/backend-error.log
+    CustomLog /var/log/apache2/backend-access.log combined
 </VirtualHost>
 EOF
 
-# Activar el sitio y desactivar el default
 a2ensite techuniverse.conf
 a2dissite 000-default.conf
 
+# =========================
+# APP DIR
+# =========================
 mkdir -p /var/www/api
 chown -R www-data:www-data /var/www/api
 
-systemctl enable apache2
-systemctl restart apache2
-
-# Certbot
-snap install core && snap refresh core
-snap install --classic certbot
-ln -sf /snap/bin/certbot /usr/bin/certbot
-
-# .env base para cuando llegue el pipeline de CD
+# =========================
+# ENV BASE
+# =========================
 cat > /var/www/.env.base << EOF
 APP_ENV=production
 APP_DEBUG=false
 APP_KEY=
+
+APP_URL=https://techuniverse.duckdns.org
+ASSET_URL=https://techuniverse.duckdns.org
+
+FILESYSTEM_DISK=r2
+
+R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+R2_BUCKET=mi-tienda
+R2_ENDPOINT=https://40bf3d98e2ec105ec6fae1f247b93770.r2.cloudflarestorage.com
+R2_PUBLIC_URL=https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev
+R2_REGION=auto
+
 DB_CONNECTION=mysql
 DB_HOST=${DB_HOST}
 DB_PORT=3306
 DB_DATABASE=techuniverse
 DB_USERNAME=root
 DB_PASSWORD=${DB_ROOT_PASSWORD}
+
 EOF
 
-# CodeDeploy Agent
-wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
-chmod +x ./install
+systemctl restart apache2
+
+# =========================
+# CODEDEPLOY AGENT
+# =========================
+cd /tmp
+curl -O https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
+chmod +x install
 ./install auto
 systemctl enable codedeploy-agent
 systemctl start codedeploy-agent

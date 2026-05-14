@@ -1,6 +1,10 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\Filament\AdminPanelProvider;
+use Filament\PanelProvider;
+
 return array_filter([
-    App\Providers\AppServiceProvider::class,
-    class_exists(\Filament\PanelProvider::class) ? App\Providers\Filament\AdminPanelProvider::class : null,
+    AppServiceProvider::class,
+    class_exists(PanelProvider::class) ? AdminPanelProvider::class : null,
 ]);

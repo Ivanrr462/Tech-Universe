@@ -23,12 +23,12 @@ class CategoriaConProductosResource extends JsonResource
                     'id' => $producto->id,
                     'nombre' => $producto->nombre,
                     'precio' => $producto->precio,
+                    'descuento' => $producto->descuento,
+                    'precioDescuento' => $producto->precioDescuento,
                     'stock' => $producto->stock,
                     'descripcion' => $producto->descripcion,
                     'creado' => $producto->created_at->format('Y-m-d H:i:s'),
-                    'foto' => $producto->foto
-                        ? env('R2_PUBLIC_URL').'/'.$producto->foto
-                        : 'https://pub-45ac6957fba64f04a0f8a0fd40292c60.r2.dev/productos/dvEcf0VxtjxaHq3yAHBw9uQr4CW4keFw3GFAUvqa.jpg',
+                    'foto' => $producto->foto,
                 ];
             }),
         ];

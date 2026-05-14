@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Categoria;
+use App\Models\Producto;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Producto>
+ * @extends Factory<Producto>
  */
 class ProductoFactory extends Factory
 {
@@ -20,7 +22,7 @@ class ProductoFactory extends Factory
             'nombre' => $this->faker->word(),
             'precio' => $this->faker->numberBetween(10, 1000),
             'descripcion' => $this->faker->sentence(),
-            'categoria_id' => \App\Models\Categoria::factory(),
+            'categoria_id' => Categoria::factory(),
             'stock' => $this->faker->numberBetween(0, 50),
         ];
     }

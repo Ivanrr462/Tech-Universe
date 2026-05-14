@@ -179,4 +179,14 @@ class AuthController extends Controller
 
         return response()->json(['mensaje' => 'Sesión cerrada correctamente']);
     }
+
+    public function me(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+    public function noAutenticado()
+    {
+        return response()->json(['mensaje' => 'No autenticado'], 401);
+    }
 }

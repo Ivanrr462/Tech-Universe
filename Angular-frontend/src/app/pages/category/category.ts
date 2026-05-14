@@ -56,8 +56,8 @@ export class Category {
         }
 
         if (slug === 'ofertas') {
-          return this.productService.getProducts(1).pipe(
-            map(r => ({ products: r.products.filter(p => p.discount), currentPage: 1, lastPage: 1, paginated: false }))
+          return this.productService.getOfferProducts().pipe(
+            map(products => ({ products, currentPage: 1, lastPage: 1, paginated: false }))
           );
         }
 

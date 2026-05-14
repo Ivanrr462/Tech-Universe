@@ -2,17 +2,18 @@
 
 namespace Database\Factories;
 
+use App\Models\especificaciones;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\especificaciones>
+ * @extends Factory<especificaciones>
  */
 class EspecificacionFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      */
-    protected $model = \App\Models\especificaciones::class;
+    protected $model = especificaciones::class;
 
     /**
      * Define the model's default state.
