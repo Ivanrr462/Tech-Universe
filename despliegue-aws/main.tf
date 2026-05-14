@@ -193,13 +193,13 @@ resource "aws_instance" "db" {
 }
 
 // IP Elásticaa
-//resource "aws_eip" "ipelastica" {
-//  instance = aws_instance.Bastion.id
-//  domain = "vpc"
-//  tags = {
-//    Name = "ip elastica"
-//  }
-//}
+resource "aws_eip" "ipelastica" {
+  instance = aws_instance.Bastion.id
+  domain = "vpc"
+  tags = {
+    Name = "ip elastica"
+  }
+}
 
 // Ruta 53
 resource "aws_route53_zone" "default" {

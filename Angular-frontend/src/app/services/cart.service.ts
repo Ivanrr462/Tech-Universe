@@ -38,14 +38,20 @@ export class CartService {
       next: (response) => {
         const cestaProductos = response.data?.productos || [];
         this.itemsSignal.set(
-          cestaProductos.map((cp: any) => ({
-            cestaProductoId: cp.id,
-            productId: cp.producto_id?.toString() ?? cp.id?.toString(),
-            name: cp.nombre ?? '',
-            price: parseFloat(cp.precio_unitario) || 0,
-            image: cp.foto ?? cp.imagen ?? '',
-            quantity: cp.cantidad,
-          }))
+          cestaProductos.map((cp: any) => {
+            const discount = cp.descuento ? Math.round(parseFloat(cp.descuento)) : undefined;
+            const hasDiscount = !!discount && discount > 0;
+            return {
+              cestaProductoId: cp.id,
+              productId: cp.producto_id?.toString() ?? cp.id?.toString(),
+              name: cp.nombre ?? '',
+              price: hasDiscount && cp.precioDescuento ? parseFloat(cp.precioDescuento) : parseFloat(cp.precio_unitario) || 0,
+              originalPrice: hasDiscount ? parseFloat(cp.precio_unitario) : undefined,
+              image: cp.foto ?? cp.imagen ?? '',
+              quantity: cp.cantidad,
+              discount,
+            };
+          })
         );
       },
       error: () => {}

@@ -180,11 +180,55 @@ class AuthController extends Controller
         return response()->json(['mensaje' => 'Sesión cerrada correctamente']);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/user",
+     *     summary="Obtener el usuario autenticado",
+     *     description="Retorna los datos del usuario autenticado mediante el token Bearer",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Datos del usuario autenticado",
+     *
+     *         @OA\JsonContent(ref="#/components/schemas/Usuario")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="mensaje", type="string", example="No autenticado")
+     *         )
+     *     )
+     * )
+     */
     public function me(Request $request)
     {
         return response()->json($request->user());
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/no-autenticado",
+     *     summary="Respuesta de no autenticado",
+     *     description="Endpoint al que redirige Sanctum cuando el usuario no esta autenticado",
+     *     tags={"Auth"},
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="No autenticado",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="mensaje", type="string", example="No autenticado")
+     *         )
+     *     )
+     * )
+     */
     public function noAutenticado()
     {
         return response()->json(['mensaje' => 'No autenticado'], 401);

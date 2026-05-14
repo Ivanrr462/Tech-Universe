@@ -3,6 +3,8 @@ export interface CartItem {
   productId: string;
   name: string;
   price: number;
+  originalPrice?: number;
   image: string;
   quantity: number;
+  discount?: number;
 }

@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Hash;
  *     type="object",
  *
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="name", type="string", example="Juan Garcia"),
- *     @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
+ *     @OA\Property(property="nombre", type="string", example="Juan Garcia"),
+ *     @OA\Property(property="correo", type="string", format="email", example="juan@example.com"),
  *     @OA\Property(property="rol", type="string", enum={"usuario", "admin"}, example="usuario")
  * )
  */
@@ -32,6 +32,7 @@ class UserController extends Controller
      *     summary="Listar todos los usuarios",
      *     description="Retorna una lista de todos los usuarios registrados",
      *     tags={"Usuarios"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Response(
      *         response=200,
@@ -58,6 +59,7 @@ class UserController extends Controller
      *     summary="Crear un nuevo usuario",
      *     description="Crea un nuevo usuario con rol 'usuario' por defecto",
      *     tags={"Usuarios"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
      *         required=true,
@@ -119,6 +121,7 @@ class UserController extends Controller
      *     summary="Obtener un usuario por ID",
      *     description="Retorna un usuario especifico por su ID",
      *     tags={"Usuarios"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",
@@ -164,6 +167,7 @@ class UserController extends Controller
      *     summary="Actualizar un usuario",
      *     description="Actualiza los datos de un usuario. Todos los campos son opcionales",
      *     tags={"Usuarios"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",
@@ -248,6 +252,7 @@ class UserController extends Controller
      *     summary="Eliminar un usuario",
      *     description="Elimina un usuario por su ID",
      *     tags={"Usuarios"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",

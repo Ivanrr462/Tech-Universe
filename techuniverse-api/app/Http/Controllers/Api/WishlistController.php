@@ -18,10 +18,10 @@ use Illuminate\Http\Request;
  *     type="object",
  *
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="name", type="string", example="Juan Garcia"),
+ *     @OA\Property(property="nombre", type="string", example="Juan Garcia"),
  *     @OA\Property(property="email", type="string", format="email", example="juan@example.com"),
  *     @OA\Property(
- *         property="deseos",
+ *         property="desea",
  *         type="array",
  *
  *         @OA\Items(ref="#/components/schemas/Producto")
@@ -36,6 +36,7 @@ class WishlistController extends Controller
      *     summary="Listar todos los usuarios con su wishlist",
      *     description="Retorna todos los usuarios con sus productos deseados",
      *     tags={"Wishlist"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Response(
      *         response=200,
@@ -62,6 +63,7 @@ class WishlistController extends Controller
      *     summary="Obtener la wishlist de un usuario",
      *     description="Retorna la wishlist de un usuario especifico",
      *     tags={"Wishlist"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",
@@ -107,6 +109,7 @@ class WishlistController extends Controller
      *     summary="Añadir un producto a la wishlist",
      *     description="Añade un producto a la wishlist de un usuario. Si ya existe, no lo duplica",
      *     tags={"Wishlist"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
      *         required=true,
@@ -179,6 +182,7 @@ class WishlistController extends Controller
      *     summary="Eliminar un producto de la wishlist",
      *     description="Elimina un producto especifico de la wishlist de un usuario",
      *     tags={"Wishlist"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="productoId",

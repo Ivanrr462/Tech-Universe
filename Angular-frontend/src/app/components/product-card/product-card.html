@@ -1,13 +1,13 @@
 <div class="group relative overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm hover:border-primary/50 transition-all duration-300">
   <!-- Badges -->
-  @if (isNew || discount) {
+  @if (isNew || (discount && discount > 0)) {
     <div class="absolute top-2 left-2 z-10 flex flex-col gap-1">
       @if (isNew) {
         <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-accent text-accent-foreground">
           Nuevo
         </span>
       }
-      @if (discount) {
+      @if (discount && discount > 0) {
         <span class="inline-flex items-center rounded-md px-2.5 py-1 text-sm font-black gradient-primary text-white shadow-lg tracking-wide">
           -{{ discount }}% OFF
         </span>
@@ -47,7 +47,7 @@
     </a>
     <div class="mt-2 flex items-baseline gap-2">
       <span class="text-2xl font-bold text-primary">{{ price }}€</span>
-      @if (originalPrice) {
+      @if (originalPrice && discount && discount > 0) {
         <span class="text-sm text-muted-foreground line-through">
           {{ originalPrice }}€
         </span>

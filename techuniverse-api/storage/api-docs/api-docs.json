@@ -227,14 +227,85 @@
                 ]
             }
         },
-        "/api/categorias": {
+        "/api/user": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Obtener el usuario autenticado",
+                "description": "Retorna los datos del usuario autenticado mediante el token Bearer",
+                "operationId": "e44b931999dcfc054d7a30b300537f43",
+                "responses": {
+                    "200": {
+                        "description": "Datos del usuario autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Usuario"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "mensaje": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/no-autenticado": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Respuesta de no autenticado",
+                "description": "Endpoint al que redirige Sanctum cuando el usuario no esta autenticado",
+                "operationId": "f4a40edae5256f32e527f399db6d0582",
+                "responses": {
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "mensaje": {
+                                            "type": "string",
+                                            "example": "No autenticado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/categoria": {
             "get": {
                 "tags": [
                     "Categorias"
                 ],
                 "summary": "Listar todas las categorias",
                 "description": "Retorna una lista de todas las categorias",
-                "operationId": "684188b8d25abcad5e1c8a786226c02b",
+                "operationId": "39a25a0c4ca44e7a15bdca633a64de07",
                 "responses": {
                     "200": {
                         "description": "Lista de categorias obtenida correctamente",
@@ -257,7 +328,7 @@
                 ],
                 "summary": "Crear una nueva categoria",
                 "description": "Crea una nueva categoria",
-                "operationId": "240f085d72cd493a2f869e93edc2c132",
+                "operationId": "31caf87e28eaca6c42c1833d9f03a536",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -317,17 +388,22 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
-        "/api/categorias/productos": {
+        "/api/categoria/productos": {
             "get": {
                 "tags": [
                     "Categorias"
                 ],
                 "summary": "Listar todas las categorias con sus productos",
                 "description": "Retorna una lista de todas las categorias incluyendo sus productos",
-                "operationId": "2ab5edb8f7787e3c0014a735e54f91ec",
+                "operationId": "1b13c1a15e7c39ca1e64e772b87e605c",
                 "responses": {
                     "200": {
                         "description": "Lista de categorias con productos obtenida correctamente",
@@ -345,14 +421,14 @@
                 }
             }
         },
-        "/api/categorias/{id}": {
+        "/api/categoria/{id}": {
             "get": {
                 "tags": [
                     "Categorias"
                 ],
                 "summary": "Obtener una categoria por ID",
                 "description": "Retorna una categoria especifica con sus productos",
-                "operationId": "0644cd38b2452f7e5c9495574afcba4e",
+                "operationId": "cc96c4e2c9d382a6312b612182a613a3",
                 "parameters": [
                     {
                         "name": "id",
@@ -400,7 +476,7 @@
                 ],
                 "summary": "Actualizar una categoria",
                 "description": "Actualiza el nombre de una categoria existente",
-                "operationId": "8124c319ebe2032b571b923486a66a77",
+                "operationId": "b705c18d15454cf322ab683013568dda",
                 "parameters": [
                     {
                         "name": "id",
@@ -488,7 +564,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -496,7 +577,7 @@
                 ],
                 "summary": "Eliminar una categoria",
                 "description": "Elimina una categoria por su ID",
-                "operationId": "266668bb5896ce68b7848fb39bf8107e",
+                "operationId": "dff942a16b1b0ff279264e8f1a19b942",
                 "parameters": [
                     {
                         "name": "id",
@@ -542,7 +623,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/cesta": {
@@ -699,7 +785,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/especificacion/productos": {
@@ -730,6 +821,89 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "tags": [
+                    "Producto Especificaciones"
+                ],
+                "summary": "Añadir una especificacion a un producto",
+                "description": "Asocia una especificacion con un valor a un producto",
+                "operationId": "b7d29292eea2572c57c3b814db7a7048",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "producto_id",
+                                    "especificacion_id",
+                                    "valor"
+                                ],
+                                "properties": {
+                                    "producto_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "especificacion_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "valor": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "16GB"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Especificacion añadida al producto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Especificacion añadida al producto"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ProductoEspecificacion"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validacion",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The producto_id field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/especificacion/{id}": {
@@ -880,7 +1054,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -934,7 +1113,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/cesta/productos": {
@@ -1385,7 +1569,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/productos/{id}": {
@@ -1564,7 +1753,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -1618,7 +1812,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/productos/count": {
@@ -1712,94 +1911,14 @@
                 }
             }
         },
-        "/api/producto/especificacion": {
-            "post": {
-                "tags": [
-                    "Producto Especificaciones"
-                ],
-                "summary": "Añadir una especificacion a un producto",
-                "description": "Asocia una especificacion con un valor a un producto",
-                "operationId": "3712916a1eb2014f51762850489b980c",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "producto_id",
-                                    "especificacion_id",
-                                    "valor"
-                                ],
-                                "properties": {
-                                    "producto_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "especificacion_id": {
-                                        "type": "integer",
-                                        "example": 2
-                                    },
-                                    "valor": {
-                                        "type": "string",
-                                        "maxLength": 255,
-                                        "example": "16GB"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Especificacion añadida al producto",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Especificacion añadida al producto"
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/ProductoEspecificacion"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Error de validacion",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "The producto_id field is required."
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/producto/especificacion/{id}": {
+        "/api/especificacion/productos/{id}": {
             "put": {
                 "tags": [
                     "Producto Especificaciones"
                 ],
                 "summary": "Actualizar el valor de una especificacion de un producto",
                 "description": "Actualiza el valor de una especificacion asociada a un producto",
-                "operationId": "f1cf18edfbf0d8170ab197933f33266e",
+                "operationId": "34113a906e66bccbb622133a394c106d",
                 "parameters": [
                     {
                         "name": "id",
@@ -1868,7 +1987,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -1876,7 +2000,7 @@
                 ],
                 "summary": "Eliminar una especificacion de un producto",
                 "description": "Elimina la asociacion entre una especificacion y un producto",
-                "operationId": "70068627177d9c734d7c1acf35395303",
+                "operationId": "cf82608318c72c7dd10ef4c3c535a1bc",
                 "parameters": [
                     {
                         "name": "id",
@@ -1922,7 +2046,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/usuarios": {
@@ -1947,7 +2076,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -2027,7 +2161,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/usuarios/{id}": {
@@ -2077,7 +2216,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "put": {
                 "tags": [
@@ -2188,7 +2332,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -2242,7 +2391,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/deseos": {
@@ -2267,7 +2421,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -2355,7 +2514,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/deseos/{id}": {
@@ -2405,7 +2569,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/deseos/{productoId}": {
@@ -2499,7 +2668,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },
@@ -2531,7 +2705,46 @@
                     "productos": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/Producto"
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "stock": {
+                                    "type": "integer",
+                                    "example": 10
+                                },
+                                "nombre": {
+                                    "type": "string",
+                                    "example": "Laptop Gaming"
+                                },
+                                "foto": {
+                                    "type": "string",
+                                    "example": "https://cdn.example.com/productos/laptop.jpg",
+                                    "nullable": true
+                                },
+                                "descripcion": {
+                                    "type": "string",
+                                    "example": "Descripcion del producto",
+                                    "nullable": true
+                                },
+                                "precio_unitario": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 1500
+                                },
+                                "descuento": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 15
+                                },
+                                "precioDescuento": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 1275
+                                }
+                            },
+                            "type": "object"
                         }
                     }
                 },
@@ -2543,9 +2756,23 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "user_id": {
-                        "type": "integer",
-                        "example": 1
+                    "usuario": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "nombre": {
+                                "type": "string",
+                                "example": "Juan Garcia"
+                            },
+                            "email": {
+                                "type": "string",
+                                "format": "email",
+                                "example": "juan@example.com"
+                            }
+                        },
+                        "type": "object"
                     },
                     "productos": {
                         "type": "array",
@@ -2559,17 +2786,47 @@
                                     "type": "string",
                                     "example": "Laptop Gaming"
                                 },
+                                "foto": {
+                                    "type": "string",
+                                    "example": "https://cdn.example.com/productos/laptop.jpg",
+                                    "nullable": true
+                                },
+                                "precio_unitario": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 1500
+                                },
+                                "descuento": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 15
+                                },
+                                "precioDescuento": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 1275
+                                },
                                 "cantidad": {
                                     "type": "integer",
                                     "example": 2
                                 },
-                                "precio_unitario": {
-                                    "type": "integer",
-                                    "example": 1500
+                                "subtotal": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 2550
                                 }
                             },
                             "type": "object"
                         }
+                    },
+                    "precio_total": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 2550
+                    },
+                    "cantidad_total": {
+                        "type": "integer",
+                        "example": 2
                     }
                 },
                 "type": "object"
@@ -2600,7 +2857,21 @@
                     "productos": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/Producto"
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "nombre": {
+                                    "type": "string",
+                                    "example": "Laptop Gaming"
+                                },
+                                "valor": {
+                                    "type": "string",
+                                    "example": "16GB"
+                                }
+                            },
+                            "type": "object"
                         }
                     }
                 },
@@ -2617,39 +2888,53 @@
                         "example": "Laptop Gaming"
                     },
                     "precio": {
-                        "type": "integer",
+                        "type": "number",
+                        "format": "float",
                         "example": 1500
+                    },
+                    "descuento": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 15
+                    },
+                    "precioDescuento": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1275
+                    },
+                    "stock": {
+                        "type": "integer",
+                        "example": 10
                     },
                     "descripcion": {
                         "type": "string",
-                        "example": "Descripción del producto",
+                        "example": "Descripcion del producto",
+                        "nullable": true
+                    },
+                    "modificado": {
+                        "type": "string",
+                        "example": "2024-01-15 10:30:00",
                         "nullable": true
                     },
                     "foto": {
                         "type": "string",
-                        "example": "https://cdn.example.com/productos/laptop.jpg"
+                        "example": "https://cdn.example.com/productos/laptop.jpg",
+                        "nullable": true
                     },
                     "categoria": {
                         "properties": {
-                            "id": {
-                                "type": "integer",
-                                "example": 2
-                            },
                             "nombre": {
                                 "type": "string",
-                                "example": "Electrónica"
+                                "example": "Electronica"
                             }
                         },
-                        "type": "object"
+                        "type": "object",
+                        "nullable": true
                     },
                     "especificaciones": {
                         "type": "array",
                         "items": {
                             "properties": {
-                                "id": {
-                                    "type": "integer",
-                                    "example": 1
-                                },
                                 "nombre": {
                                     "type": "string",
                                     "example": "RAM"
@@ -2682,6 +2967,12 @@
                     "valor": {
                         "type": "string",
                         "example": "16GB"
+                    },
+                    "producto": {
+                        "$ref": "#/components/schemas/Producto"
+                    },
+                    "especificacion": {
+                        "$ref": "#/components/schemas/Especificacion"
                     }
                 },
                 "type": "object"
@@ -2692,11 +2983,11 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "name": {
+                    "nombre": {
                         "type": "string",
                         "example": "Juan Garcia"
                     },
-                    "email": {
+                    "correo": {
                         "type": "string",
                         "format": "email",
                         "example": "juan@example.com"
@@ -2718,7 +3009,7 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "name": {
+                    "nombre": {
                         "type": "string",
                         "example": "Juan Garcia"
                     },
@@ -2727,7 +3018,7 @@
                         "format": "email",
                         "example": "juan@example.com"
                     },
-                    "deseos": {
+                    "desea": {
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/Producto"

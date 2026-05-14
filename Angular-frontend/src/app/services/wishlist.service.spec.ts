@@ -51,9 +51,11 @@ describe('WishlistService', () => {
   it('should load wishlist items when user logs in', () => {
     userSubject.next({ id: 5 });
     httpMock.expectOne('/api/deseos/5').flush({
-      desea: [
-        { id: 1, nombre: 'Laptop', precio: 999, foto: 'laptop.jpg', categoria: { nombre: 'Portátiles' } },
-      ],
+      data: {
+        desea: [
+          { id: 1, nombre: 'Laptop', precio: 999, foto: 'laptop.jpg', categoria: { nombre: 'Portátiles' } },
+        ],
+      },
     });
 
     expect(service.items().length).toBe(1);
@@ -64,7 +66,7 @@ describe('WishlistService', () => {
 
   it('should add item to wishlist', () => {
     userSubject.next({ id: 5 });
-    httpMock.expectOne('/api/deseos/5').flush({ desea: [] });
+    httpMock.expectOne('/api/deseos/5').flush({ data: { desea: [] } });
 
     mockAuthService.currentUserValue = { id: 5 };
     service.addToWishlist('42', 'Tablet', 299, 'tablet.jpg', 'Tablets');
@@ -80,7 +82,9 @@ describe('WishlistService', () => {
   it('should remove item from wishlist', () => {
     userSubject.next({ id: 5 });
     httpMock.expectOne('/api/deseos/5').flush({
-      desea: [{ id: 42, nombre: 'Tablet', precio: 299, foto: '', categoria: null }],
+      data: {
+        desea: [{ id: 42, nombre: 'Tablet', precio: 299, foto: '', categoria: null }],
+      },
     });
     expect(service.isInWishlist('42')).toBe(true);
 

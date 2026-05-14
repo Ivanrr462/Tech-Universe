@@ -32,7 +32,13 @@ use Illuminate\Http\Request;
  *         property="productos",
  *         type="array",
  *
- *         @OA\Items(ref="#/components/schemas/Producto")
+ *         @OA\Items(
+ *             type="object",
+ *
+ *             @OA\Property(property="id", type="integer", example=1),
+ *             @OA\Property(property="nombre", type="string", example="Laptop Gaming"),
+ *             @OA\Property(property="valor", type="string", example="16GB")
+ *         )
  *     )
  * )
  */
@@ -108,6 +114,7 @@ class EspecifiacionController extends Controller
      *     summary="Crear una nueva especificacion",
      *     description="Crea una nueva especificacion",
      *     tags={"Especificaciones"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
      *         required=true,
@@ -212,6 +219,7 @@ class EspecifiacionController extends Controller
      *     summary="Actualizar una especificacion",
      *     description="Actualiza el nombre de una especificacion existente",
      *     tags={"Especificaciones"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",
@@ -291,6 +299,7 @@ class EspecifiacionController extends Controller
      *     summary="Eliminar una especificacion",
      *     description="Elimina una especificacion por su ID",
      *     tags={"Especificaciones"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",

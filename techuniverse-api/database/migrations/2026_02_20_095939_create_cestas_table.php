@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('cestas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            //$table->string('stripe_intent_id')->nullable();
+            $table->string('stripe_intent_id')->nullable();
             $table->timestamps();
         });
     }

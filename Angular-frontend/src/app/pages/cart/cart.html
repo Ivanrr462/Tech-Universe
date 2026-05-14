@@ -12,7 +12,15 @@
 
                 <div class="flex-1 text-center sm:text-left">
                     <h3 class="font-semibold text-gray-900 dark:text-white">{{ item.name }}</h3>
-                    <p class="text-violet-600 dark:text-violet-400 font-medium">{{ item.price | currency:'EUR' }}</p>
+                    @if (item.discount && item.discount > 0 && item.originalPrice) {
+                      <span class="inline-block text-xs font-bold text-white gradient-primary rounded px-1.5 py-0.5 mb-1">-{{ item.discount }}% OFF</span>
+                      <div class="flex items-baseline gap-2 justify-center sm:justify-start">
+                        <p class="text-violet-600 dark:text-violet-400 font-medium">{{ item.price | currency:'EUR' }}</p>
+                        <p class="text-sm text-gray-400 line-through">{{ item.originalPrice | currency:'EUR' }}</p>
+                      </div>
+                    } @else {
+                      <p class="text-violet-600 dark:text-violet-400 font-medium">{{ item.price | currency:'EUR' }}</p>
+                    }
                 </div>
 
                 <div class="flex items-center gap-4">

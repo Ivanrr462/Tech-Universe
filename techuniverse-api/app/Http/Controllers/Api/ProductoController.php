@@ -20,14 +20,18 @@ use Illuminate\Support\Facades\Storage;
  *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="nombre", type="string", example="Laptop Gaming"),
- *     @OA\Property(property="precio", type="integer", example=1500),
- *     @OA\Property(property="descripcion", type="string", nullable=true, example="Descripción del producto"),
- *     @OA\Property(property="foto", type="string", example="https://cdn.example.com/productos/laptop.jpg"),
+ *     @OA\Property(property="precio", type="number", format="float", example=1500.00),
+ *     @OA\Property(property="descuento", type="number", format="float", example=15.00),
+ *     @OA\Property(property="precioDescuento", type="number", format="float", example=1275.00),
+ *     @OA\Property(property="stock", type="integer", example=10),
+ *     @OA\Property(property="descripcion", type="string", nullable=true, example="Descripcion del producto"),
+ *     @OA\Property(property="modificado", type="string", nullable=true, example="2024-01-15 10:30:00"),
+ *     @OA\Property(property="foto", type="string", nullable=true, example="https://cdn.example.com/productos/laptop.jpg"),
  *     @OA\Property(
  *         property="categoria",
  *         type="object",
- *         @OA\Property(property="id", type="integer", example=2),
- *         @OA\Property(property="nombre", type="string", example="Electrónica")
+ *         nullable=true,
+ *         @OA\Property(property="nombre", type="string", example="Electronica")
  *     ),
  *     @OA\Property(
  *         property="especificaciones",
@@ -36,7 +40,6 @@ use Illuminate\Support\Facades\Storage;
  *         @OA\Items(
  *             type="object",
  *
- *             @OA\Property(property="id", type="integer", example=1),
  *             @OA\Property(property="nombre", type="string", example="RAM"),
  *             @OA\Property(property="valor", type="string", example="16GB")
  *         )
@@ -249,6 +252,7 @@ class ProductoController extends Controller
      *     summary="Crear un nuevo producto",
      *     description="Crea un producto nuevo con imagen subida a R2",
      *     tags={"Productos"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
      *         required=true,
@@ -324,6 +328,7 @@ class ProductoController extends Controller
      *     summary="Actualizar un producto",
      *     description="Actualiza los datos de un producto. Se usa POST con _method=PUT por compatibilidad con multipart/form-data",
      *     tags={"Productos"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",
@@ -427,6 +432,7 @@ class ProductoController extends Controller
      *     summary="Eliminar un producto",
      *     description="Elimina un producto y su imagen del bucket R2",
      *     tags={"Productos"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",

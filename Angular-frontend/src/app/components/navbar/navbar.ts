@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Search, ShoppingCart, User, Menu, ChevronDown, LogOut, Heart } from 'lucide-angular';
+import { LucideAngularModule, Search, ShoppingCart, User, LogOut, Heart } from 'lucide-angular';
 import { ThemeService } from '@services/theme.service';
 import { CartService } from '@services/cart.service';
 import { AuthService } from '@services/auth.service';
@@ -35,14 +35,11 @@ export class Navbar {
   readonly SearchIcon = Search;
   readonly ShoppingCartIcon = ShoppingCart;
   readonly UserIcon = User;
-  readonly MenuIcon = Menu;
-  readonly ChevronDownIcon = ChevronDown;
   readonly LogOutIcon = LogOut;
   readonly HeartIcon = Heart;
 
   searchQuery = '';
   categories = CATEGORIES;
-  showCategoryDropdown = false;
 
   handleSearch(event: Event): void {
     event.preventDefault();
@@ -55,21 +52,5 @@ export class Navbar {
 
   navigateTo(path: string): void {
     this.router.navigate([path]);
-  }
-
-  navigateToCategory(category: string): void {
-    const slug = category.toLowerCase().replace(/\s+/g, '-');
-    this.router.navigate(['/category', slug]);
-    this.showCategoryDropdown = false;
-  }
-
-  toggleCategoryDropdown(): void {
-    this.showCategoryDropdown = !this.showCategoryDropdown;
-  }
-
-  closeCategoryDropdown(): void {
-    setTimeout(() => {
-      this.showCategoryDropdown = false;
-    }, 200);
   }
 }
