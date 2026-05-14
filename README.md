@@ -15,8 +15,6 @@ E-commerce tecnológico desarrollado con arquitectura desacoplada, micro-fronten
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-web-services&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-%232088FF.svg?style=for-the-badge&logo=github-actions&logoColor=white)
 
-[![Despliegue del código](https://github.com/Ivanrr462/Tech-Universe/actions/workflows/codedeploy.yml/badge.svg)](https://github.com/Ivanrr462/Tech-Universe/actions/workflows/codedeploy.yml)
-
 <br/>
 
 [Demostración en vídeo](https://drive.google.com/file/d/1ALMScHhkEyg9Yz9KpZ_TAwLdgAdaIH_u/view?usp=sharing) · [Documentación API](https://ivan123.alwaysdata.net/api/documentation/) · [Diseño Figma](https://www.figma.com/design/CdztUWth7lbVUKpVMSYNvb/Proyecto-Intermodular?node-id=0-1&p=f&t=3Ktj0fuLzQOQryqP-0)
