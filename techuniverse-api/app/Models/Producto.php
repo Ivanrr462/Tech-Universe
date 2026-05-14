@@ -11,7 +11,17 @@ class Producto extends Model
 
     protected $fillable = ['nombre', 'precio', 'stock', 'descripcion', 'descuento', 'categoria_id', 'foto'];
 
-    protected $appends = ['foto_url'];
+    protected $appends = ['foto_url', 'precio_descuento'];
+
+    public function getPrecioDescuentoAttribute(): float
+    {
+        $precio = (float) $this->precio;
+        $descuento = (float) ($this->descuento ?? 0);
+
+        return $descuento > 0
+            ? round($precio - ($precio * ($descuento / 100)), 2)
+            : $precio;
+    }
 
     public function getFotoUrlAttribute(): string
     {

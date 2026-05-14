@@ -22,17 +22,20 @@ use Illuminate\Http\Request;
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="producto_id", type="integer", example=1),
  *     @OA\Property(property="especificacion_id", type="integer", example=2),
- *     @OA\Property(property="valor", type="string", example="16GB")
+ *     @OA\Property(property="valor", type="string", example="16GB"),
+ *     @OA\Property(property="producto", ref="#/components/schemas/Producto"),
+ *     @OA\Property(property="especificacion", ref="#/components/schemas/Especificacion")
  * )
  */
 class ProductoEspecifiacionController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/producto/especificacion",
+     *     path="/api/especificacion/productos",
      *     summary="Añadir una especificacion a un producto",
      *     description="Asocia una especificacion con un valor a un producto",
      *     tags={"Producto Especificaciones"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
      *         required=true,
@@ -91,10 +94,11 @@ class ProductoEspecifiacionController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/producto/especificacion/{id}",
+     *     path="/api/especificacion/productos/{id}",
      *     summary="Actualizar el valor de una especificacion de un producto",
      *     description="Actualiza el valor de una especificacion asociada a un producto",
      *     tags={"Producto Especificaciones"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",
@@ -160,10 +164,11 @@ class ProductoEspecifiacionController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/producto/especificacion/{id}",
+     *     path="/api/especificacion/productos/{id}",
      *     summary="Eliminar una especificacion de un producto",
      *     description="Elimina la asociacion entre una especificacion y un producto",
      *     tags={"Producto Especificaciones"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",

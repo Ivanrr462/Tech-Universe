@@ -17,7 +17,13 @@ use Illuminate\Http\Request;
  *     type="object",
  *
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="user_id", type="integer", example=1),
+ *     @OA\Property(
+ *         property="usuario",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="nombre", type="string", example="Juan Garcia"),
+ *         @OA\Property(property="email", type="string", format="email", example="juan@example.com")
+ *     ),
  *     @OA\Property(
  *         property="productos",
  *         type="array",
@@ -27,10 +33,16 @@ use Illuminate\Http\Request;
  *
  *             @OA\Property(property="id", type="integer", example=1),
  *             @OA\Property(property="nombre", type="string", example="Laptop Gaming"),
+ *             @OA\Property(property="foto", type="string", nullable=true, example="https://cdn.example.com/productos/laptop.jpg"),
+ *             @OA\Property(property="precio_unitario", type="number", format="float", example=1500.00),
+ *             @OA\Property(property="descuento", type="number", format="float", example=15.00),
+ *             @OA\Property(property="precioDescuento", type="number", format="float", example=1275.00),
  *             @OA\Property(property="cantidad", type="integer", example=2),
- *             @OA\Property(property="precio_unitario", type="integer", example=1500)
+ *             @OA\Property(property="subtotal", type="number", format="float", example=2550.00)
  *         )
- *     )
+ *     ),
+ *     @OA\Property(property="precio_total", type="number", format="float", example=2550.00),
+ *     @OA\Property(property="cantidad_total", type="integer", example=2)
  * )
  */
 class CestaController extends Controller

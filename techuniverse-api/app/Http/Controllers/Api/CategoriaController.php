@@ -32,7 +32,18 @@ use Illuminate\Http\Request;
  *         property="productos",
  *         type="array",
  *
- *         @OA\Items(ref="#/components/schemas/Producto")
+ *         @OA\Items(
+ *             type="object",
+ *
+ *             @OA\Property(property="id", type="integer", example=1),
+ *             @OA\Property(property="stock", type="integer", example=10),
+ *             @OA\Property(property="nombre", type="string", example="Laptop Gaming"),
+ *             @OA\Property(property="foto", type="string", nullable=true, example="https://cdn.example.com/productos/laptop.jpg"),
+ *             @OA\Property(property="descripcion", type="string", nullable=true, example="Descripcion del producto"),
+ *             @OA\Property(property="precio_unitario", type="number", format="float", example=1500.00),
+ *             @OA\Property(property="descuento", type="number", format="float", example=15.00),
+ *             @OA\Property(property="precioDescuento", type="number", format="float", example=1275.00)
+ *         )
  *     )
  * )
  */
@@ -40,7 +51,7 @@ class CategoriaController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/categorias",
+     *     path="/api/categoria",
      *     summary="Listar todas las categorias",
      *     description="Retorna una lista de todas las categorias",
      *     tags={"Categorias"},
@@ -66,7 +77,7 @@ class CategoriaController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/categorias/productos",
+     *     path="/api/categoria/productos",
      *     summary="Listar todas las categorias con sus productos",
      *     description="Retorna una lista de todas las categorias incluyendo sus productos",
      *     tags={"Categorias"},
@@ -92,10 +103,11 @@ class CategoriaController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/categorias",
+     *     path="/api/categoria",
      *     summary="Crear una nueva categoria",
      *     description="Crea una nueva categoria",
      *     tags={"Categorias"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
      *         required=true,
@@ -146,7 +158,7 @@ class CategoriaController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/categorias/{id}",
+     *     path="/api/categoria/{id}",
      *     summary="Obtener una categoria por ID",
      *     description="Retorna una categoria especifica con sus productos",
      *     tags={"Categorias"},
@@ -195,10 +207,11 @@ class CategoriaController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/categorias/{id}",
+     *     path="/api/categoria/{id}",
      *     summary="Actualizar una categoria",
      *     description="Actualiza el nombre de una categoria existente",
      *     tags={"Categorias"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",
@@ -274,10 +287,11 @@ class CategoriaController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/categorias/{id}",
+     *     path="/api/categoria/{id}",
      *     summary="Eliminar una categoria",
      *     description="Elimina una categoria por su ID",
      *     tags={"Categorias"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\Parameter(
      *         name="id",
