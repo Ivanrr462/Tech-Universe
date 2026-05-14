@@ -89,26 +89,6 @@
 
     <!-- Category Navigation (hidden on mobile) -->
     <div class="hidden md:flex items-center gap-4 py-3 border-t border-border/50">
-      <!-- Category Dropdown -->
-      <div class="relative">
-        <button (click)="toggleCategoryDropdown()" (blur)="closeCategoryDropdown()"
-          class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 px-3">
-          <lucide-icon [img]="MenuIcon" class="h-4 w-4 mr-2"></lucide-icon>
-          Categorías
-        </button>
-
-        @if (showCategoryDropdown) {
-        <div class="absolute top-full left-0 mt-2 w-56 rounded-md border border-border bg-card shadow-md z-[100]">
-          @for (category of categories; track category) {
-          <button (click)="navigateToCategory(category)"
-            class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground w-full text-left">
-            {{ category }}
-          </button>
-          }
-        </div>
-        }
-      </div>
-
       <!-- Category Links -->
       <a routerLink="/category/todos"
         routerLinkActive="text-primary font-medium"
