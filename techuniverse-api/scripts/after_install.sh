@@ -37,12 +37,30 @@ export COMPOSER_HOME=/root/.composer
 composer install --no-dev --optimize-autoloader --no-interaction
 
 # =========================
-# ARTISAN
+# APP KEY — solo si no hay una ya generada
 # =========================
-php artisan key:generate --force
+if grep -q "^APP_KEY=$" .env; then
+  php artisan key:generate --force
+fi
 
-php artisan migrate:fresh --seed --force --no-interaction
+# =========================
+# MIGRACIONES
+# — migrate:fresh solo en el primer despliegue (no existe ninguna tabla aún)
+# — migrate en despliegues posteriores (conserva los datos)
+# =========================
+TABLES=$(php artisan db:show --json 2>/dev/null | grep -c '"name"' || echo 0)
 
+if [ "$TABLES" -le 1 ]; then
+  echo "📦 Primera instalación — ejecutando migrate:fresh --seed"
+  php artisan migrate:fresh --seed --force --no-interaction
+else
+  echo "🔄 Despliegue de código — ejecutando migrate"
+  php artisan migrate --force --no-interaction
+fi
+
+# =========================
+# CACHÉ
+# =========================
 php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache || true

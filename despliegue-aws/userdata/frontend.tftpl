@@ -18,7 +18,7 @@ systemctl enable apache2
 # DUCKDNS
 # =========================
 PUBLIC_IP=$(curl -s http://checkip.amazonaws.com)
-DUCKDNS_RESP=$(curl -s "https://www.duckdns.org/update?domains=techuniverse5&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP")
+DUCKDNS_RESP=$(curl -s "https://www.duckdns.org/update?domains=techuniverse6&token=${DUCKDNS_TOKEN}&ip=$PUBLIC_IP")
 echo "DuckDNS response: $DUCKDNS_RESP (IP: $PUBLIC_IP)"
 if [ "$DUCKDNS_RESP" != "OK" ]; then
   echo "⚠️  DuckDNS no devolvió OK — el subdominio puede no estar registrado en la cuenta"
@@ -43,7 +43,7 @@ chown -R www-data:www-data /var/www/frontend
 # =========================
 cat > /etc/apache2/sites-available/techuniverse.conf << 'EOF'
 <VirtualHost *:80>
-    ServerName techuniverse5.duckdns.org
+    ServerName techuniverse6.duckdns.org
     DocumentRoot /var/www/frontend
 
     <Directory /var/www/frontend>
@@ -62,13 +62,13 @@ sleep 30
 # =========================
 # CERTBOT (HTTPS)
 # =========================
-CERT_PATH="/etc/letsencrypt/live/techuniverse5.duckdns.org/fullchain.pem"
+CERT_PATH="/etc/letsencrypt/live/techuniverse6.duckdns.org/fullchain.pem"
 
 if [ ! -f "$CERT_PATH" ]; then
   echo "Intentando generar certificado SSL..."
 
   certbot --apache \
-    -d techuniverse5.duckdns.org \
+    -d techuniverse6.duckdns.org \
     --non-interactive \
     --agree-tos \
     -m ivan.rios1712@gmail.com
@@ -96,12 +96,12 @@ fi
 cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
-    ServerName techuniverse5.duckdns.org
+    ServerName techuniverse6.duckdns.org
 
     SSLEngine on
     Include /etc/letsencrypt/options-ssl-apache.conf
-    SSLCertificateFile /etc/letsencrypt/live/techuniverse5.duckdns.org/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse5.duckdns.org/privkey.pem
+    SSLCertificateFile /etc/letsencrypt/live/techuniverse6.duckdns.org/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/techuniverse6.duckdns.org/privkey.pem
 
     DocumentRoot /var/www/frontend
 
@@ -142,7 +142,7 @@ cat > /etc/apache2/sites-available/techuniverse-le-ssl.conf << EOF
 EOF
 
 # Solo activar el vhost HTTPS si el certificado existe
-if [ -f "/etc/letsencrypt/live/techuniverse5.duckdns.org/fullchain.pem" ]; then
+if [ -f "/etc/letsencrypt/live/techuniverse6.duckdns.org/fullchain.pem" ]; then
   a2ensite techuniverse-le-ssl.conf
   systemctl reload apache2
   echo "✅ VHost HTTPS activado"
