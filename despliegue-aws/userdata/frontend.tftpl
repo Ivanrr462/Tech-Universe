@@ -57,7 +57,16 @@ a2ensite techuniverse.conf
 a2dissite 000-default.conf
 systemctl restart apache2
 
-sleep 30
+echo "Esperando propagación DNS..."
+for i in $(seq 1 12); do
+  RESOLVED=$(dig +short techuniverse.duckdns.org @8.8.8.8 | tail -1)
+  if [ "$RESOLVED" = "$PUBLIC_IP" ]; then
+    echo "✅ DNS propagado correctamente ($RESOLVED)"
+    break
+  fi
+  echo "⏳ Intento $i — DNS resuelve $RESOLVED, esperando..."
+  sleep 10
+done
 
 # =========================
 # CERTBOT (HTTPS)
