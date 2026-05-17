@@ -1,12 +1,18 @@
 #!/bin/bash
 exec > /var/log/userdata.log 2>&1
 
+# Esperar a que se libere el lock de apt (unattended-upgrades arranca al inicio)
+until flock -n /var/lib/dpkg/lock-frontend true 2>/dev/null; do
+  echo "Esperando lock de apt..."
+  sleep 5
+done
+
 # =========================
 # DEPENDENCIAS
 # =========================
 apt-get update -y
 DEBIAN_FRONTEND=noninteractive apt-get install -y \
-  apache2 curl unzip snapd ruby-full wget
+  apache2 curl unzip snapd ruby-full wget dnsutils
 
 # =========================
 # APACHE MODULES
